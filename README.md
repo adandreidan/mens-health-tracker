@@ -1,50 +1,40 @@
-# Welcome to your Expo app 👋
+# Men’s Health Analytics Tracker
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A full-stack mobile application that transforms anonymized health data into interpretable insights using structured scoring logic, data analysis, and a modern mobile interface. The project emphasizes explainability, modular system design, and real-world data constraints.
 
-## Get started
+---
 
-1. Install dependencies
+## Overview
 
-   ```bash
-   npm install
-   ```
+This application analyzes health-related metrics (e.g., blood tests, lifestyle factors, age group comparisons) and presents users with clear, visual insights into how their data compares to broader population trends.
 
-2. Start the app
+Rather than relying on opaque predictions, the system focuses on **transparent scoring**, **data validation**, and **graceful handling of missing inputs**, reflecting real-world healthcare data challenges.
 
-   ```bash
-   npx expo start
-   ```
+---
 
-In the output, you'll find options to open the app in a
+## Architecture & Ownership
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+This project was designed and implemented end-to-end.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+### Frontend
+- Built with **Expo (React Native + TypeScript)**
+- File-based routing using **Expo Router**
+- Modular, reusable UI components
+- Data visualizations designed for clarity and interpretability
 
-## Get a fresh project
+### Application Logic (Backend-equivalent)
+- Scoring, validation, and aggregation logic implemented through structured scripts and utilities
+- Custom hooks and shared helpers abstract business logic from UI
+- Strong type safety through centralized TypeScript definitions
 
-When you're ready, run:
+> The current backend exists as **local data-processing and scoring logic** within the application, designed to be easily externalized into an API as the project scales.
 
-```bash
-npm run reset-project
-```
+---
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Key Engineering Challenges Solved
 
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- **Interpretable Scoring:** Designed a scoring system that balances statistical relevance with user interpretability
+- **Missing Data Handling:** Implemented logic to safely compute results even with incomplete inputs
+- **Weight Verification:** Ensured scoring weights are mathematically consistent and verifiable
+- **Separation of Concerns:** Clean separation between UI, business logic, and data models
+- **Scalable Design:** Structured the project so logic can be migrated to a server-based API without refactoring the frontend
