@@ -22,7 +22,7 @@ This project was designed and implemented end-to-end.
 - Modular, reusable UI components
 - Data visualizations designed for clarity and interpretability
 
-### Application Logic (Backend-equivalent)
+### Application Logic 
 - Scoring, validation, and aggregation logic implemented through structured scripts and utilities
 - Custom hooks and shared helpers abstract business logic from UI
 - Strong type safety through centralized TypeScript definitions
