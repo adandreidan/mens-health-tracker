@@ -104,7 +104,7 @@ A more realistic "excellent" score might be in the **85-95 range**, representing
 - Above-average performance across most metrics
 - Near-optimal values in key areas (semen analysis, DNA quality)
 - Good hormonal balance
-- Healthy lifestyle factors
+- Health lifestyle factors
 
 ### Score Interpretation
 - **90-100**: Exceptional/Eltie (top 1-5%)
