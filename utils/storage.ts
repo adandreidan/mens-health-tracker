@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MensHealthCardData } from '../types/mens-health-types';
 
 const STORAGE_KEY = '@mens_health_cards';
+const SELECTED_CARD_KEY = '@selected_health_card';
 
 // Save a new Men's Health Card
 export async function saveMensHealthCard(card: MensHealthCardData): Promise<void> {
@@ -74,5 +75,35 @@ export async function getMostRecentCard(): Promise<MensHealthCardData | null> {
     } catch (error) {
         console.error('Error getting most recent card:', error);
         return null;
+    }
+}
+
+// Get the selected card for leaderboard
+export async function getSelectedCard(): Promise<MensHealthCardData | null> {
+    try {
+        const selectedId = await AsyncStorage.getItem(SELECTED_CARD_KEY);
+        if (!selectedId) {
+            // If no card is selected, return the most recent card as default
+            return await getMostRecentCard();
+        }
+
+        const cards = await loadMensHealthCards();
+        const selectedCard = cards.find(card => card.id === selectedId);
+
+        // If selected card doesn't exist, fall back to most recent
+        return selectedCard || await getMostRecentCard();
+    } catch (error) {
+        console.error('Error getting selected card:', error);
+        return await getMostRecentCard();
+    }
+}
+
+// Set the selected card for leaderboard
+export async function setSelectedCard(cardId: string): Promise<void> {
+    try {
+        await AsyncStorage.setItem(SELECTED_CARD_KEY, cardId);
+    } catch (error) {
+        console.error('Error setting selected card:', error);
+        throw new Error('Failed to select card');
     }
 }

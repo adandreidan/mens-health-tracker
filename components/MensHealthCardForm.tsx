@@ -82,7 +82,7 @@ export default function MensHealthCardForm({ onSubmit, onCancel }: MensHealthCar
 
     const handleSubmit = () => {
         if (!validateForm()) {
-            Alert.alert('Validation Error', 'Please fix the errors and try again.');
+            Alert.alert('Validation Error', 'Please fill in all required fields and fix any errors shown in red.');
             return;
         }
 

@@ -10,9 +10,9 @@ import {
 } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { BorderRadius, Colors, Shadows, Spacing, Typography } from '../constants/design-system';
+import { getSelectedCard } from '../utils/storage';
 import { hormoneData, currentUserData as importedCurrentUserData, participantData, semenData, serumFattyAcids, spermFattyAcids } from './data';
-import { getMostRecentCard } from '../utils/storage';
-import { Colors, Shadows, BorderRadius, Typography, Spacing } from '../constants/design-system';
 
 // Types for our data structures
 interface UserData {
@@ -365,16 +365,16 @@ export default function Leaderboard() {
         const sortedData = dataWithScores.sort((a, b) => b.overall_score - a.overall_score);
         let allScores = sortedData.map(d => d.overall_score);
 
-        // Load most recent Men's Health Card
+        // Load selected Men's Health Card
         let cardScore = null;
         try {
-          const recentCard = await getMostRecentCard();
-          setMensHealthCard(recentCard);
+          const selectedCard = await getSelectedCard();
+          setMensHealthCard(selectedCard);
 
-          if (recentCard) {
+          if (selectedCard) {
             // Convert Men's Health Index (0-100) to leaderboard score scale
             // The leaderboard uses a different scoring system, so we normalize
-            cardScore = recentCard.overallHealthIndex;
+            cardScore = selectedCard.overallHealthIndex;
 
             // Add card score to all scores for percentile calculation
             allScores = [...allScores, cardScore];
