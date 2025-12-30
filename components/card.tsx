@@ -1,28 +1,31 @@
 // Men's Health Cards Page
 // Displays all created cards and allows creating new ones
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
+  ActivityIndicator,
+  Alert,
+  Modal,
   ScrollView,
   StyleSheet,
   Text,
-  View,
   TouchableOpacity,
-  Modal,
-  Alert,
-  ActivityIndicator,
+  View,
 } from 'react-native';
+import { BorderRadius, Colors, Shadows, Spacing, Typography } from '../constants/design-system';
+import { calculateHealthCardData } from '../data/mens-health-references';
+import { LifestyleMetrics, MensHealthCardData, SemenQualityMetrics } from '../types/mens-health-types';
+import { deleteMensHealthCard, getSelectedCard, loadMensHealthCards, saveMensHealthCard, setSelectedCard } from '../utils/storage';
 import MensHealthCard from './MensHealthCard';
 import MensHealthCardForm from './MensHealthCardForm';
-import { MensHealthCardData, SemenQualityMetrics, LifestyleMetrics } from '../types/mens-health-types';
-import { saveMensHealthCard, loadMensHealthCards } from '../utils/storage';
-import { calculateHealthCardData } from '../data/mens-health-references';
-import { Colors, Shadows, BorderRadius, Typography, Spacing } from '../constants/design-system';
 
 export default function Card() {
   const [cards, setCards] = useState<MensHealthCardData[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [deleteMode, setDeleteMode] = useState(false);
 
   // Load cards on mount
   useEffect(() => {
@@ -38,10 +41,42 @@ export default function Card() {
         (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
       setCards(sortedCards);
+
+      // Load selected card
+      const selectedCard = await getSelectedCard();
+      setSelectedCardId(selectedCard?.id || null);
     } catch (error) {
       Alert.alert('Error', 'Failed to load cards');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCardSelect = async (cardId: string) => {
+    try {
+      await setSelectedCard(cardId);
+      setSelectedCardId(cardId);
+      setSelectionMode(false);
+      Alert.alert('Success', 'Card selected for leaderboard rankings!');
+    } catch (error) {
+      Alert.alert('Error', 'Failed to select card');
+    }
+  };
+
+  const handleCardDelete = async (cardId: string) => {
+    try {
+      await deleteMensHealthCard(cardId);
+
+      // If the deleted card was selected, clear the selection
+      if (selectedCardId === cardId) {
+        setSelectedCardId(null);
+      }
+
+      await loadCards();
+      setDeleteMode(false);
+      Alert.alert('Success', 'Card deleted successfully');
+    } catch (error) {
+      Alert.alert('Error', 'Failed to delete card');
     }
   };
 
@@ -51,8 +86,11 @@ export default function Card() {
     notes: string
   ) => {
     try {
+      console.log('Creating card with data:', { semen, lifestyle, notes });
+
       // Calculate scores
       const cardData = calculateHealthCardData(semen, lifestyle, notes);
+      console.log('Calculated card data:', cardData);
 
       // Create new card with ID and timestamp
       const newCard: MensHealthCardData = {
@@ -61,8 +99,11 @@ export default function Card() {
         ...cardData,
       };
 
+      console.log('New card object:', newCard);
+
       // Save to storage
       await saveMensHealthCard(newCard);
+      console.log('Card saved to storage');
 
       // Reload cards
       await loadCards();
@@ -72,7 +113,8 @@ export default function Card() {
 
       Alert.alert('Success', 'Men\'s Health Card created successfully!');
     } catch (error) {
-      Alert.alert('Error', 'Failed to create card');
+      console.error('Error creating card:', error);
+      Alert.alert('Error', `Failed to create card: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
@@ -90,9 +132,38 @@ export default function Card() {
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.title}>Men's Health Cards</Text>
-          <TouchableOpacity style={styles.createButton} onPress={() => setShowForm(true)}>
-            <Text style={styles.createButtonText}>+ Create New Card</Text>
-          </TouchableOpacity>
+          <View style={styles.headerButtons}>
+            {!selectionMode && !deleteMode && cards.length > 0 && (
+              <>
+                <TouchableOpacity
+                  style={styles.selectButton}
+                  onPress={() => setSelectionMode(true)}
+                >
+                  <Text style={styles.selectButtonText}>Select for Rankings</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.deleteModeButton}
+                  onPress={() => setDeleteMode(true)}
+                >
+                  <Text style={styles.deleteModeButtonText}>Delete Cards</Text>
+                </TouchableOpacity>
+              </>
+            )}
+            {(selectionMode || deleteMode) && (
+              <TouchableOpacity
+                style={styles.cancelSelectButton}
+                onPress={() => {
+                  setSelectionMode(false);
+                  setDeleteMode(false);
+                }}
+              >
+                <Text style={styles.cancelSelectButtonText}>Cancel</Text>
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity style={styles.createButton} onPress={() => setShowForm(true)}>
+              <Text style={styles.createButtonText}>+ Create New Card</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Empty State */}
@@ -115,7 +186,14 @@ export default function Card() {
         <View style={styles.cardsGrid}>
           {cards.map((card) => (
             <View key={card.id} style={styles.cardWrapper}>
-              <MensHealthCard card={card} />
+              <MensHealthCard
+                card={card}
+                isSelected={selectedCardId === card.id}
+                onSelect={handleCardSelect}
+                showSelectionIndicator={selectionMode}
+                onDelete={handleCardDelete}
+                showDeleteButton={deleteMode}
+              />
             </View>
           ))}
         </View>
@@ -125,7 +203,6 @@ export default function Card() {
       <Modal
         visible={showForm}
         animationType="slide"
-        presentationStyle="pageSheet"
         onRequestClose={() => setShowForm(false)}
       >
         <MensHealthCardForm
@@ -157,6 +234,10 @@ const styles = StyleSheet.create({
   header: {
     marginBottom: Spacing.lg,
   },
+  headerButtons: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+  },
   title: {
     fontSize: Typography.size.xxxl,
     fontWeight: Typography.weight.bold,
@@ -175,6 +256,50 @@ const styles = StyleSheet.create({
   createButtonText: {
     color: Colors.white,
     fontSize: Typography.size.base,
+    fontWeight: Typography.weight.semibold,
+    letterSpacing: 0.5,
+  },
+  selectButton: {
+    backgroundColor: Colors.white,
+    borderWidth: 1,
+    borderColor: Colors.black,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    borderRadius: BorderRadius.md,
+    alignSelf: 'flex-start',
+    ...Shadows.sm,
+  },
+  selectButtonText: {
+    color: Colors.black,
+    fontSize: Typography.size.sm,
+    fontWeight: Typography.weight.semibold,
+    letterSpacing: 0.5,
+  },
+  cancelSelectButton: {
+    backgroundColor: Colors.grey100,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    borderRadius: BorderRadius.md,
+    alignSelf: 'flex-start',
+    ...Shadows.sm,
+  },
+  cancelSelectButtonText: {
+    color: Colors.textSecondary,
+    fontSize: Typography.size.sm,
+    fontWeight: Typography.weight.semibold,
+    letterSpacing: 0.5,
+  },
+  deleteModeButton: {
+    backgroundColor: Colors.error || '#FF3B30',
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    borderRadius: BorderRadius.md,
+    alignSelf: 'flex-start',
+    ...Shadows.sm,
+  },
+  deleteModeButtonText: {
+    color: Colors.white,
+    fontSize: Typography.size.sm,
     fontWeight: Typography.weight.semibold,
     letterSpacing: 0.5,
   },
@@ -216,7 +341,7 @@ const styles = StyleSheet.create({
     marginHorizontal: -Spacing.sm,
   },
   cardWrapper: {
-    width: '100%',
-    paddingHorizontal: Spacing.sm,
+    width: '15%', // Much smaller cards - about 6-7 per row
+    paddingHorizontal: Spacing.xs,
   },
 });

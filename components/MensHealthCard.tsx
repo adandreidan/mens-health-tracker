@@ -4,28 +4,34 @@
 
 import React, { useState } from 'react';
 import {
-    View,
-    Text,
-    StyleSheet,
-    TouchableOpacity,
+    Alert,
     Animated,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
-import { MensHealthCardData } from '../types/mens-health-types';
+import { BorderRadius, Colors, Shadows, Spacing, Typography } from '../constants/design-system';
 import {
     HEALTH_REFERENCE_RANGES,
+    classifyMetric,
     getRiskLevel,
     getRiskLevelColor,
-    getStatusColor,
-    classifyMetric,
     getSemenComparisonLabel,
+    getStatusColor,
 } from '../data/mens-health-references';
-import { Colors, Shadows, BorderRadius, Typography, Spacing } from '../constants/design-system';
+import { MensHealthCardData } from '../types/mens-health-types';
 
 interface MensHealthCardProps {
     card: MensHealthCardData;
+    isSelected?: boolean;
+    onSelect?: (cardId: string) => void;
+    showSelectionIndicator?: boolean;
+    onDelete?: (cardId: string) => void;
+    showDeleteButton?: boolean;
 }
 
-export default function MensHealthCard({ card }: MensHealthCardProps) {
+export default function MensHealthCard({ card, isSelected = false, onSelect, showSelectionIndicator = false, onDelete, showDeleteButton = false }: MensHealthCardProps) {
     const [isFlipped, setIsFlipped] = useState(false);
     const [flipAnim] = useState(new Animated.Value(0));
 
@@ -67,8 +73,51 @@ export default function MensHealthCard({ card }: MensHealthCardProps) {
         year: 'numeric',
     });
 
+    const handlePress = () => {
+        if (showSelectionIndicator && onSelect) {
+            onSelect(card.id);
+        } else if (!showDeleteButton) {
+            handleFlip();
+        }
+        // In delete mode, only the delete indicator handles taps
+    };
+
     return (
-        <TouchableOpacity onPress={handleFlip} activeOpacity={0.9} style={styles.container}>
+        <TouchableOpacity onPress={handlePress} activeOpacity={0.9} style={styles.container}>
+            {/* Selection Indicator */}
+            {showSelectionIndicator && (
+                <View style={[styles.selectionIndicator, isSelected && styles.selectionIndicatorSelected]}>
+                    <Text style={[styles.selectionIndicatorText, isSelected && styles.selectionIndicatorTextSelected]}>
+                        {isSelected ? '✓' : ''}
+                    </Text>
+                </View>
+            )}
+
+            {/* Delete Indicator */}
+            {showDeleteButton && onDelete && (
+                <TouchableOpacity
+                    style={styles.deleteIndicator}
+                    onPress={() => {
+                        console.log('Delete indicator pressed for card:', card.id);
+                        Alert.alert(
+                            'Delete Card',
+                            'Are you sure you want to delete this health card? This action cannot be undone.',
+                            [
+                                { text: 'Cancel', style: 'cancel' },
+                                {
+                                    text: 'Delete',
+                                    style: 'destructive',
+                                    onPress: () => onDelete(card.id)
+                                },
+                            ]
+                        );
+                    }}
+                    activeOpacity={0.7}
+                >
+                    <Text style={styles.deleteIndicatorText}>Tap to Delete</Text>
+                </TouchableOpacity>
+            )}
+
             {/* Front Side */}
             <Animated.View
                 style={[
@@ -283,18 +332,18 @@ function LifestyleRow({ label, value }: { label: string; value: string }) {
 const styles = StyleSheet.create({
     container: {
         width: '100%',
-        aspectRatio: 0.65,
-        marginBottom: Spacing.base,
+        aspectRatio: 0.4, // Very compact - much shorter cards
+        marginBottom: Spacing.xs,
     },
     card: {
         position: 'absolute',
         width: '100%',
         height: '100%',
         backgroundColor: Colors.white,
-        borderRadius: BorderRadius.xl,
+        borderRadius: BorderRadius.sm,
         borderWidth: 1,
         borderColor: Colors.border,
-        padding: Spacing.xl,
+        padding: Spacing.sm,
         ...Shadows.md,
         backfaceVisibility: 'hidden',
     },
@@ -312,23 +361,23 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     cardTitle: {
-        fontSize: Typography.size.lg,
+        fontSize: Typography.size.xs,
         fontWeight: Typography.weight.semibold,
         color: Colors.textPrimary,
         textAlign: 'center',
-        marginBottom: Spacing.sm,
+        marginBottom: Spacing.xs,
     },
     scoreContainer: {
         flexDirection: 'row',
         alignItems: 'baseline',
         justifyContent: 'center',
-        marginVertical: Spacing.xl,
+        marginVertical: Spacing.xs,
     },
     scoreValue: {
-        fontSize: Typography.size.huge,
+        fontSize: Typography.size.base,
         fontWeight: Typography.weight.bold,
         color: Colors.black,
-        letterSpacing: -2,
+        letterSpacing: -0.5,
     },
     scoreOutOf: {
         fontSize: Typography.size.xxl,
@@ -337,29 +386,29 @@ const styles = StyleSheet.create({
     },
     riskBadge: {
         alignSelf: 'center',
-        paddingHorizontal: Spacing.lg,
-        paddingVertical: Spacing.sm,
+        paddingHorizontal: Spacing.sm,
+        paddingVertical: 2,
         borderRadius: BorderRadius.full,
-        borderWidth: 1.5,
+        borderWidth: 1,
         borderColor: Colors.black,
-        marginBottom: Spacing.lg,
+        marginBottom: Spacing.xs,
     },
     riskText: {
         color: Colors.white,
         fontWeight: Typography.weight.semibold,
-        fontSize: Typography.size.base,
+        fontSize: Typography.size.xs,
     },
     statsPreview: {
         flex: 1,
         justifyContent: 'space-around',
     },
     previewItem: {
-        marginVertical: Spacing.sm,
+        marginVertical: 2,
     },
     previewLabel: {
-        fontSize: Typography.size.sm,
+        fontSize: 8,
         color: Colors.textSecondary,
-        marginBottom: Spacing.xs,
+        marginBottom: 1,
         textTransform: 'uppercase',
         letterSpacing: 0.5,
     },
@@ -368,20 +417,20 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     previewValueText: {
-        fontSize: Typography.size.lg,
+        fontSize: Typography.size.xs,
         fontWeight: Typography.weight.semibold,
     },
     dateText: {
-        fontSize: Typography.size.sm,
+        fontSize: 8,
         color: Colors.textTertiary,
         textAlign: 'center',
-        marginTop: Spacing.md,
+        marginTop: 2,
     },
     tapHint: {
-        fontSize: Typography.size.xs,
+        fontSize: 8,
         color: Colors.textTertiary,
         textAlign: 'center',
-        marginTop: Spacing.sm,
+        marginTop: 2,
         fontStyle: 'italic',
     },
     sectionTitle: {
@@ -421,5 +470,48 @@ const styles = StyleSheet.create({
         fontSize: Typography.size.xs,
         color: Colors.textTertiary,
         marginTop: 2,
+    },
+    selectionIndicator: {
+        position: 'absolute',
+        top: Spacing.sm,
+        right: Spacing.sm,
+        width: 24,
+        height: 24,
+        borderRadius: 12,
+        borderWidth: 2,
+        borderColor: Colors.border,
+        backgroundColor: Colors.white,
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 10,
+        ...Shadows.sm,
+    },
+    selectionIndicatorSelected: {
+        borderColor: Colors.black,
+        backgroundColor: Colors.black,
+    },
+    selectionIndicatorText: {
+        fontSize: Typography.size.sm,
+        fontWeight: Typography.weight.bold,
+        color: Colors.textSecondary,
+    },
+    selectionIndicatorTextSelected: {
+        color: Colors.white,
+    },
+    deleteIndicator: {
+        position: 'absolute',
+        top: Spacing.xs,
+        right: Spacing.xs,
+        backgroundColor: Colors.error || '#FF3B30',
+        paddingHorizontal: Spacing.sm,
+        paddingVertical: Spacing.xs,
+        borderRadius: BorderRadius.sm,
+        zIndex: 100, // Higher z-index to ensure it's on top
+        ...Shadows.sm,
+    },
+    deleteIndicatorText: {
+        fontSize: 8,
+        fontWeight: Typography.weight.bold,
+        color: Colors.white,
     },
 });
