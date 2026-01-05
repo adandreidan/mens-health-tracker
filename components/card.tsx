@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { BorderRadius, Colors, Shadows, Spacing, Typography } from '../constants/design-system';
 import { calculateHealthCardData } from '../data/mens-health-references';
 import { LifestyleMetrics, MensHealthCardData, SemenQualityMetrics } from '../types/mens-health-types';
@@ -64,20 +65,33 @@ export default function Card() {
   };
 
   const handleCardDelete = async (cardId: string) => {
-    try {
-      await deleteMensHealthCard(cardId);
+    Alert.alert(
+      'Delete Card',
+      'Are you sure you want to delete this health card? This action cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteMensHealthCard(cardId);
 
-      // If the deleted card was selected, clear the selection
-      if (selectedCardId === cardId) {
-        setSelectedCardId(null);
-      }
+              // If the deleted card was selected, clear the selection
+              if (selectedCardId === cardId) {
+                setSelectedCardId(null);
+              }
 
-      await loadCards();
-      setDeleteMode(false);
-      Alert.alert('Success', 'Card deleted successfully');
-    } catch (error) {
-      Alert.alert('Error', 'Failed to delete card');
-    }
+              await loadCards();
+              setDeleteMode(false);
+              Alert.alert('Success', 'Card deleted successfully');
+            } catch (error) {
+              Alert.alert('Error', 'Failed to delete card');
+            }
+          },
+        },
+      ]
+    );
   };
 
   const handleCreateCard = async (
@@ -127,7 +141,7 @@ export default function Card() {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
         {/* Header */}
         <View style={styles.header}>
@@ -210,7 +224,7 @@ export default function Card() {
           onCancel={() => setShowForm(false)}
         />
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 }
 

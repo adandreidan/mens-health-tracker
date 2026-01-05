@@ -4,7 +4,6 @@
 
 import React, { useState } from 'react';
 import {
-    Alert,
     Animated,
     StyleSheet,
     Text,
@@ -76,10 +75,9 @@ export default function MensHealthCard({ card, isSelected = false, onSelect, sho
     const handlePress = () => {
         if (showSelectionIndicator && onSelect) {
             onSelect(card.id);
-        } else if (!showDeleteButton) {
+        } else {
             handleFlip();
         }
-        // In delete mode, only the delete indicator handles taps
     };
 
     return (
@@ -93,28 +91,14 @@ export default function MensHealthCard({ card, isSelected = false, onSelect, sho
                 </View>
             )}
 
-            {/* Delete Indicator */}
+            {/* Delete Button */}
             {showDeleteButton && onDelete && (
                 <TouchableOpacity
-                    style={styles.deleteIndicator}
-                    onPress={() => {
-                        console.log('Delete indicator pressed for card:', card.id);
-                        Alert.alert(
-                            'Delete Card',
-                            'Are you sure you want to delete this health card? This action cannot be undone.',
-                            [
-                                { text: 'Cancel', style: 'cancel' },
-                                {
-                                    text: 'Delete',
-                                    style: 'destructive',
-                                    onPress: () => onDelete(card.id)
-                                },
-                            ]
-                        );
-                    }}
+                    style={styles.deleteButton}
+                    onPress={() => onDelete(card.id)}
                     activeOpacity={0.7}
                 >
-                    <Text style={styles.deleteIndicatorText}>Tap to Delete</Text>
+                    <Text style={styles.deleteButtonText}>✕</Text>
                 </TouchableOpacity>
             )}
 
@@ -498,20 +482,23 @@ const styles = StyleSheet.create({
     selectionIndicatorTextSelected: {
         color: Colors.white,
     },
-    deleteIndicator: {
+    deleteButton: {
         position: 'absolute',
         top: Spacing.xs,
         right: Spacing.xs,
+        width: 20,
+        height: 20,
+        borderRadius: 10,
         backgroundColor: Colors.error || '#FF3B30',
-        paddingHorizontal: Spacing.sm,
-        paddingVertical: Spacing.xs,
-        borderRadius: BorderRadius.sm,
-        zIndex: 100, // Higher z-index to ensure it's on top
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 20,
         ...Shadows.sm,
     },
-    deleteIndicatorText: {
-        fontSize: 8,
+    deleteButtonText: {
+        fontSize: Typography.size.sm,
         fontWeight: Typography.weight.bold,
         color: Colors.white,
+        lineHeight: 16,
     },
 });
