@@ -3,13 +3,10 @@
 
 import {
     HealthReferenceRanges,
-    MensHealthCardData,
-    SemenQualityMetrics,
     LifestyleMetrics,
+    MensHealthCardData,
     MetricStatus,
-    SmokingStatus,
-    AlcoholRiskLevel,
-    DietQuality,
+    SemenQualityMetrics
 } from '../types/mens-health-types';
 
 // WHO 6th edition (2021) reference values - 5th percentile lower limits
@@ -239,13 +236,15 @@ export function getSemenComparisonLabel(value: number, metricName: keyof typeof 
 export function calculateHealthCardData(
     semen: SemenQualityMetrics,
     lifestyle: LifestyleMetrics,
-    notes?: string
+    notes?: string,
+    name?: string
 ): Omit<MensHealthCardData, 'id' | 'createdAt'> {
     const semenQualityScore = calculateSemenQualityScore(semen);
     const lifestyleScore = calculateLifestyleScore(lifestyle);
     const overallHealthIndex = calculateOverallHealthIndex(semenQualityScore, lifestyleScore);
 
     return {
+        name,
         semenQuality: semen,
         lifestyle,
         notes,

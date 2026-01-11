@@ -114,6 +114,9 @@ export default function MensHealthCard({ card, isSelected = false, onSelect, sho
                 ]}
             >
                 <View style={styles.frontContent}>
+                    {card.name && (
+                        <Text style={styles.cardName}>{card.name}</Text>
+                    )}
                     <Text style={styles.cardTitle}>Men's Health Index</Text>
 
                     <View style={styles.scoreContainer}>
@@ -149,8 +152,10 @@ export default function MensHealthCard({ card, isSelected = false, onSelect, sho
                         />
                     </View>
 
-                    <Text style={styles.dateText}>{formattedDate}</Text>
-                    <Text style={styles.tapHint}>Tap to view details →</Text>
+                    <View style={styles.bottomSection}>
+                        <Text style={styles.dateText}>{formattedDate}</Text>
+                        <Text style={styles.tapHint}>Tap to view details →</Text>
+                    </View>
                 </View>
             </Animated.View>
 
@@ -242,7 +247,7 @@ export default function MensHealthCard({ card, isSelected = false, onSelect, sho
                         />
                     </View>
 
-                    <Text style={[styles.sectionTitle, { marginTop: 16 }]}>Lifestyle Factors</Text>
+                    <Text style={[styles.sectionTitle, { marginTop: Spacing.base }]}>Lifestyle Factors</Text>
                     <View style={styles.metricsTable}>
                         <LifestyleRow label="Smoking" value={card.lifestyle.smokingStatus} />
                         <LifestyleRow label="Alcohol Risk" value={card.lifestyle.alcoholRiskLevel} />
@@ -316,7 +321,7 @@ function LifestyleRow({ label, value }: { label: string; value: string }) {
 const styles = StyleSheet.create({
     container: {
         width: '100%',
-        aspectRatio: 0.4, // Very compact - much shorter cards
+        aspectRatio: 0.42, // Taller cards to fit all back-side content without overlap
         marginBottom: Spacing.xs,
     },
     card: {
@@ -324,10 +329,10 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
         backgroundColor: Colors.white,
-        borderRadius: BorderRadius.sm,
+        borderRadius: BorderRadius.md,
         borderWidth: 1,
         borderColor: Colors.border,
-        padding: Spacing.sm,
+        padding: Spacing.base,
         ...Shadows.md,
         backfaceVisibility: 'hidden',
     },
@@ -340,33 +345,42 @@ const styles = StyleSheet.create({
     frontContent: {
         flex: 1,
         justifyContent: 'space-between',
+        minHeight: 0,
     },
     backContent: {
         flex: 1,
+        paddingBottom: Spacing.sm,
+    },
+    cardName: {
+        fontSize: Typography.size.base,
+        fontWeight: Typography.weight.bold,
+        color: Colors.black,
+        textAlign: 'center',
+        marginBottom: Spacing.sm,
     },
     cardTitle: {
-        fontSize: Typography.size.xs,
+        fontSize: Typography.size.sm,
         fontWeight: Typography.weight.semibold,
         color: Colors.textPrimary,
         textAlign: 'center',
-        marginBottom: Spacing.xs,
+        marginBottom: Spacing.sm,
     },
     scoreContainer: {
         flexDirection: 'row',
         alignItems: 'baseline',
         justifyContent: 'center',
-        marginVertical: Spacing.xs,
+        marginVertical: Spacing.sm,
     },
     scoreValue: {
-        fontSize: Typography.size.base,
+        fontSize: Typography.size.xl,
         fontWeight: Typography.weight.bold,
         color: Colors.black,
         letterSpacing: -0.5,
     },
     scoreOutOf: {
-        fontSize: Typography.size.xxl,
+        fontSize: Typography.size.lg,
         color: Colors.textTertiary,
-        marginLeft: Spacing.xs,
+        marginLeft: Spacing.sm,
     },
     riskBadge: {
         alignSelf: 'center',
@@ -375,7 +389,7 @@ const styles = StyleSheet.create({
         borderRadius: BorderRadius.full,
         borderWidth: 1,
         borderColor: Colors.black,
-        marginBottom: Spacing.xs,
+        marginBottom: Spacing.sm,
     },
     riskText: {
         color: Colors.white,
@@ -383,16 +397,20 @@ const styles = StyleSheet.create({
         fontSize: Typography.size.xs,
     },
     statsPreview: {
-        flex: 1,
-        justifyContent: 'space-around',
+        flexShrink: 1,
+        justifyContent: 'center',
+        paddingVertical: Spacing.sm,
+    },
+    bottomSection: {
+        marginTop: Spacing.xs,
     },
     previewItem: {
-        marginVertical: 2,
+        marginVertical: Spacing.xs / 2,
     },
     previewLabel: {
-        fontSize: 8,
+        fontSize: Typography.size.xs,
         color: Colors.textSecondary,
-        marginBottom: 1,
+        marginBottom: Spacing.xs,
         textTransform: 'uppercase',
         letterSpacing: 0.5,
     },
@@ -405,34 +423,33 @@ const styles = StyleSheet.create({
         fontWeight: Typography.weight.semibold,
     },
     dateText: {
-        fontSize: 8,
+        fontSize: Typography.size.xs,
         color: Colors.textTertiary,
         textAlign: 'center',
-        marginTop: 2,
+        marginBottom: Spacing.xs / 2,
     },
     tapHint: {
-        fontSize: 8,
+        fontSize: Typography.size.xs,
         color: Colors.textTertiary,
         textAlign: 'center',
-        marginTop: 2,
         fontStyle: 'italic',
     },
     sectionTitle: {
         fontSize: Typography.size.base,
         fontWeight: Typography.weight.semibold,
         color: Colors.black,
-        marginBottom: Spacing.md,
+        marginBottom: Spacing.sm,
         textTransform: 'uppercase',
         letterSpacing: 0.5,
     },
     metricsTable: {
-        marginBottom: Spacing.sm,
+        marginBottom: Spacing.base,
     },
     metricRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'flex-start',
-        paddingVertical: Spacing.md,
+        paddingVertical: Spacing.sm,
         borderBottomWidth: 1,
         borderBottomColor: Colors.border,
     },

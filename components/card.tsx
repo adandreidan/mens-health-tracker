@@ -97,13 +97,14 @@ export default function Card() {
   const handleCreateCard = async (
     semen: SemenQualityMetrics,
     lifestyle: LifestyleMetrics,
-    notes: string
+    notes: string,
+    name?: string
   ) => {
     try {
-      console.log('Creating card with data:', { semen, lifestyle, notes });
+      console.log('Creating card with data:', { semen, lifestyle, notes, name });
 
       // Calculate scores
-      const cardData = calculateHealthCardData(semen, lifestyle, notes);
+      const cardData = calculateHealthCardData(semen, lifestyle, notes, name);
       console.log('Calculated card data:', cardData);
 
       // Create new card with ID and timestamp
@@ -355,7 +356,8 @@ const styles = StyleSheet.create({
     marginHorizontal: -Spacing.sm,
   },
   cardWrapper: {
-    width: '15%', // Much smaller cards - about 6-7 per row
-    paddingHorizontal: Spacing.xs,
+    width: '48%', // 2 cards per row for better readability
+    paddingHorizontal: Spacing.sm,
+    marginBottom: Spacing.base,
   },
 });

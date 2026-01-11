@@ -3,29 +3,34 @@
 
 import React, { useState } from 'react';
 import {
-    View,
-    Text,
-    StyleSheet,
-    TextInput,
-    ScrollView,
-    TouchableOpacity,
     Alert,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
+import { BorderRadius, Colors, Shadows, Spacing, Typography } from '../constants/design-system';
 import {
-    SemenQualityMetrics,
-    LifestyleMetrics,
-    SmokingStatus,
     AlcoholRiskLevel,
     DietQuality,
+    LifestyleMetrics,
+    SemenQualityMetrics,
+    SmokingStatus,
 } from '../types/mens-health-types';
-import { Colors, Shadows, BorderRadius, Typography, Spacing } from '../constants/design-system';
 
 interface MensHealthCardFormProps {
-    onSubmit: (semen: SemenQualityMetrics, lifestyle: LifestyleMetrics, notes: string) => void;
+    onSubmit: (semen: SemenQualityMetrics, lifestyle: LifestyleMetrics, notes: string, name?: string) => void;
     onCancel: () => void;
 }
 
 export default function MensHealthCardForm({ onSubmit, onCancel }: MensHealthCardFormProps) {
+    // Name state
+    const [name, setName] = useState('');
+
     // Semen quality state
     const [spermConcentration, setSpermConcentration] = useState('');
     const [totalSpermCount, setTotalSpermCount] = useState('');
@@ -103,17 +108,35 @@ export default function MensHealthCardForm({ onSubmit, onCancel }: MensHealthCar
             dietQuality,
         };
 
-        onSubmit(semenData, lifestyleData, notes);
+        onSubmit(semenData, lifestyleData, notes, name.trim() || undefined);
     };
 
     return (
-        <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-            <View style={styles.header}>
+        <KeyboardAvoidingView 
+            style={styles.container} 
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={0}
+        >
+            <ScrollView 
+                style={styles.scrollView} 
+                contentContainerStyle={styles.contentContainer}
+                showsVerticalScrollIndicator={true}
+                keyboardShouldPersistTaps="handled"
+            >
+                <View style={styles.header}>
                 <Text style={styles.title}>Create Men's Health Card</Text>
                 <TouchableOpacity onPress={onCancel} style={styles.cancelButton}>
                     <Text style={styles.cancelText}>✕</Text>
                 </TouchableOpacity>
             </View>
+
+            {/* Name Section */}
+            <InputField
+                label="Name (Optional)"
+                value={name}
+                onChangeText={setName}
+                placeholder="Enter your name"
+            />
 
             {/* Semen Quality Section */}
             <Text style={styles.sectionTitle}>Semen Quality Metrics</Text>
@@ -225,11 +248,12 @@ export default function MensHealthCardForm({ onSubmit, onCancel }: MensHealthCar
                 numberOfLines={3}
             />
 
-            {/* Submit Button */}
-            <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-                <Text style={styles.submitButtonText}>Create Card</Text>
-            </TouchableOpacity>
-        </ScrollView>
+                {/* Submit Button */}
+                <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+                    <Text style={styles.submitButtonText}>Create Card</Text>
+                </TouchableOpacity>
+            </ScrollView>
+        </KeyboardAvoidingView>
     );
 }
 
@@ -309,9 +333,12 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: Colors.white,
     },
+    scrollView: {
+        flex: 1,
+    },
     contentContainer: {
         padding: Spacing.xl,
-        paddingBottom: Spacing.xxxl,
+        paddingBottom: Spacing.xxxl * 3,
     },
     header: {
         flexDirection: 'row',

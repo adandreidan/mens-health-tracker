@@ -29,6 +29,7 @@ export interface LifestyleMetrics {
 export interface MensHealthCardData {
     id: string;
     createdAt: string; // ISO date string
+    name?: string; // User's name
     semenQuality: SemenQualityMetrics;
     lifestyle: LifestyleMetrics;
     notes?: string;
