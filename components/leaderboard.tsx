@@ -577,8 +577,8 @@ export default function Leaderboard() {
           <Text style={styles.subtitle}>See how you compare to other men</Text>
         </View>
 
-        {/* Current User Card */}
-        {currentUser && (
+        {/* Current User Card - Only show when health card exists */}
+        {mensHealthCard && currentUser && (
           <View style={styles.currentUserCard}>
             <Text style={styles.currentUserTitle}>Your Position</Text>
             <Text style={styles.currentUserScore}>
@@ -590,69 +590,60 @@ export default function Leaderboard() {
           </View>
         )}
 
-        {/* Current User Detailed Metrics */}
-        {currentUserData && (
+        {/* Current User Detailed Metrics - Only show when health card exists */}
+        {mensHealthCard && (
           <View style={styles.currentUserMetrics}>
             <Text style={styles.metricsTitle}>Your Stats</Text>
             <View style={styles.metricsGrid}>
               <View style={styles.metricItem}>
-                <Text style={styles.metricLabel}>Sperm Count</Text>
-                <Text style={styles.metricValue}>{currentUserData['Total sperm count (x10â¶)']}M</Text>
+                <Text style={styles.metricLabel}>Health Index</Text>
+                <Text style={styles.metricValue}>{mensHealthCard.overallHealthIndex}/100</Text>
+              </View>
+              <View style={styles.metricItem}>
+                <Text style={styles.metricLabel}>Sperm Conc.</Text>
+                <Text style={styles.metricValue}>{mensHealthCard.semenQuality.spermConcentration}M/mL</Text>
+              </View>
+              <View style={styles.metricItem}>
+                <Text style={styles.metricLabel}>Total Count</Text>
+                <Text style={styles.metricValue}>{mensHealthCard.semenQuality.totalSpermCount}M</Text>
               </View>
               <View style={styles.metricItem}>
                 <Text style={styles.metricLabel}>Motility</Text>
-                <Text style={styles.metricValue}>{currentUserData['Progressive motility (%)']}%</Text>
+                <Text style={styles.metricValue}>{mensHealthCard.semenQuality.progressiveMotility}%</Text>
               </View>
               <View style={styles.metricItem}>
-                <Text style={styles.metricLabel}>Testosterone</Text>
-                <Text style={styles.metricValue}>{(currentUserData['Serum total testosterone (nmol/L)'] * 28.8).toFixed(0)} ng/dL</Text>
+                <Text style={styles.metricLabel}>Morphology</Text>
+                <Text style={styles.metricValue}>{mensHealthCard.semenQuality.normalMorphology}%</Text>
               </View>
               <View style={styles.metricItem}>
-                <Text style={styles.metricLabel}>DNA Quality</Text>
-                <Text style={styles.metricValue}>{(100 - currentUserData['DNA fragmentation index, DFI (%)']).toFixed(0)}%</Text>
+                <Text style={styles.metricLabel}>Volume</Text>
+                <Text style={styles.metricValue}>{mensHealthCard.semenQuality.semenVolume}mL</Text>
               </View>
               <View style={styles.metricItem}>
-                <Text style={styles.metricLabel}>DHA Level</Text>
-                <Text style={styles.metricValue}>{currentUserData['Sperm C22:6,n3 (docosahexaenoic acid, DHA)']}%</Text>
+                <Text style={styles.metricLabel}>Lifestyle Score</Text>
+                <Text style={styles.metricValue}>{Math.round(mensHealthCard.lifestyleScore)}/100</Text>
               </View>
               <View style={styles.metricItem}>
-                <Text style={styles.metricLabel}>Age</Text>
-                <Text style={styles.metricValue}>{currentUserData['Age (years)']} years</Text>
+                <Text style={styles.metricLabel}>Smoking</Text>
+                <Text style={styles.metricValue}>{mensHealthCard.lifestyle.smokingStatus}</Text>
+              </View>
+              <View style={styles.metricItem}>
+                <Text style={styles.metricLabel}>Exercise</Text>
+                <Text style={styles.metricValue}>{mensHealthCard.lifestyle.weeklyExerciseMinutes}min/wk</Text>
+              </View>
+              <View style={styles.metricItem}>
+                <Text style={styles.metricLabel}>Sleep</Text>
+                <Text style={styles.metricValue}>{mensHealthCard.lifestyle.sleepHoursPerNight}hrs</Text>
+              </View>
+              <View style={styles.metricItem}>
+                <Text style={styles.metricLabel}>Diet</Text>
+                <Text style={styles.metricValue}>{mensHealthCard.lifestyle.dietQuality}</Text>
+              </View>
+              <View style={styles.metricItem}>
+                <Text style={styles.metricLabel}>Alcohol Risk</Text>
+                <Text style={styles.metricValue}>{mensHealthCard.lifestyle.alcoholRiskLevel}</Text>
               </View>
             </View>
-
-            {/* Men's Health Card Section */}
-            {mensHealthCard && (
-              <>
-                <Text style={[styles.metricsTitle, { marginTop: 20 }]}>Men's Health Card</Text>
-                <View style={styles.metricsGrid}>
-                  <View style={styles.metricItem}>
-                    <Text style={styles.metricLabel}>Health Index</Text>
-                    <Text style={styles.metricValue}>{mensHealthCard.overallHealthIndex}/100</Text>
-                  </View>
-                  <View style={styles.metricItem}>
-                    <Text style={styles.metricLabel}>Sperm Conc.</Text>
-                    <Text style={styles.metricValue}>{mensHealthCard.semenQuality.spermConcentration}M/mL</Text>
-                  </View>
-                  <View style={styles.metricItem}>
-                    <Text style={styles.metricLabel}>Lifestyle</Text>
-                    <Text style={styles.metricValue}>{Math.round(mensHealthCard.lifestyleScore)}/100</Text>
-                  </View>
-                  <View style={styles.metricItem}>
-                    <Text style={styles.metricLabel}>Smoking</Text>
-                    <Text style={styles.metricValue}>{mensHealthCard.lifestyle.smokingStatus}</Text>
-                  </View>
-                  <View style={styles.metricItem}>
-                    <Text style={styles.metricLabel}>Exercise</Text>
-                    <Text style={styles.metricValue}>{mensHealthCard.lifestyle.weeklyExerciseMinutes}min/wk</Text>
-                  </View>
-                  <View style={styles.metricItem}>
-                    <Text style={styles.metricLabel}>Sleep</Text>
-                    <Text style={styles.metricValue}>{mensHealthCard.lifestyle.sleepHoursPerNight}hrs</Text>
-                  </View>
-                </View>
-              </>
-            )}
           </View>
         )}
 
