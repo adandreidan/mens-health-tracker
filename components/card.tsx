@@ -17,6 +17,7 @@ import { BorderRadius, Colors, Shadows, Spacing, Typography } from '../constants
 import { calculateHealthCardData } from '../data/mens-health-references';
 import { LifestyleMetrics, MensHealthCardData, SemenQualityMetrics } from '../types/mens-health-types';
 import { deleteMensHealthCard, getSelectedCard, loadMensHealthCards, saveMensHealthCard, setSelectedCard } from '../utils/storage';
+import FlexingManLogo from './FlexingManLogo';
 import MensHealthCard from './MensHealthCard';
 import MensHealthCardForm from './MensHealthCardForm';
 
@@ -146,7 +147,10 @@ export default function Card() {
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>Men's Health Cards</Text>
+          <View style={styles.headerTop}>
+            <FlexingManLogo size={60} />
+            <Text style={styles.title}>Men's Health Cards</Text>
+          </View>
           <View style={styles.headerButtons}>
             {!selectionMode && !deleteMode && cards.length > 0 && (
               <>
@@ -249,6 +253,12 @@ const styles = StyleSheet.create({
   header: {
     marginBottom: Spacing.lg,
   },
+  headerTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+    marginBottom: Spacing.md,
+  },
   headerButtons: {
     flexDirection: 'row',
     gap: Spacing.sm,
@@ -257,8 +267,8 @@ const styles = StyleSheet.create({
     fontSize: Typography.size.xxxl,
     fontWeight: Typography.weight.bold,
     color: Colors.black,
-    marginBottom: Spacing.md,
     letterSpacing: -1,
+    flex: 1,
   },
   createButton: {
     backgroundColor: Colors.black,

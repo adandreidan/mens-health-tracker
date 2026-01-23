@@ -517,7 +517,7 @@ export default function Leaderboard() {
 
   // Generate number line data for individual points view
   const generateNumberLineData = () => {
-    if (userData.length === 0) return { labels: [], datasets: [] };
+    if (userData.length === 0) return { labels: [], datasets: [], userPoints: [] };
 
     const scores = userData.map(d => d.overall_score);
     const minScore = 0; // Start at 0
@@ -739,7 +739,7 @@ export default function Leaderboard() {
               </Text>
             </View>
           ) : (
-            <View>
+            <View style={styles.numberLineWrapper}>
               {/* Current User Marker - Above Number Line */}
               {chartData.currentUserPoint && (
                 <View style={styles.currentUserMarkerAboveChart}>
@@ -755,42 +755,54 @@ export default function Leaderboard() {
                 </View>
               )}
 
-              {/* Invisible chart for coordinate system only */}
-              <View style={{ height: 20, backgroundColor: 'transparent' }} />
-              {/* Visible horizontal line through the dots */}
-              <View style={styles.numberLine}>
-                <View style={styles.numberLineBar} />
-              </View>
+              {/* Number Line Container with relative positioning */}
+              <View style={styles.numberLineViewContainer}>
+                {/* Visible horizontal line through the dots */}
+                <View style={styles.numberLine}>
+                  <View style={styles.numberLineBar} />
+                </View>
 
-              {/* Number labels below the line */}
-              <View style={styles.numberLineLabels}>
-                {numberLineData.labels.map((label, index) => (
-                  <Text key={index} style={styles.numberLineLabel}>
-                    {label}
-                  </Text>
-                ))}
-              </View>
+                {/* Individual user points on number line */}
+                <View style={styles.numberLineContainer}>
+                  {numberLineData.userPoints && numberLineData.userPoints.length > 0 ? (
+                    numberLineData.userPoints.map((point, index) => {
+                      // Use the same minScore (0) and maxScore as the labels
+                      const minScore = 0;
+                      const scores = userData.map(d => d.overall_score);
+                      const maxScore = scores.length > 0 ? Math.ceil(Math.max(...scores)) : 100;
+                      const scoreRange = maxScore - minScore;
+                      const position = scoreRange > 0 ? ((point.x - minScore) / scoreRange) * 100 : 50;
 
-              {/* Individual user points on number line */}
-              <View style={styles.numberLineContainer}>
-                {numberLineData.userPoints?.map((point, index) => {
-                  // Use the same minScore (0) and maxScore as the labels
-                  const minScore = 0;
-                  const maxScore = Math.ceil(Math.max(...userData.map(d => d.overall_score)));
-                  const scoreRange = maxScore - minScore;
-                  const position = scoreRange > 0 ? ((point.x - minScore) / scoreRange) * 100 : 50;
+                      return (
+                        <View
+                          key={index}
+                          style={[
+                            styles.numberLinePoint,
+                            Math.abs(point.x - (currentUserScore || 0)) < 0.5 && styles.numberLineCurrentUserPoint,
+                            { left: `${Math.max(0, Math.min(100, position))}%` },
+                          ]}
+                        />
+                      );
+                    })
+                  ) : (
+                    <View style={styles.emptyNumberLineMessage}>
+                      <Text style={styles.emptyNumberLineText}>No data available</Text>
+                    </View>
+                  )}
+                </View>
 
-                  return (
-                    <View
-                      key={index}
-                      style={[
-                        styles.numberLinePoint,
-                        Math.abs(point.x - (currentUserScore || 0)) < 0.5 && styles.numberLineCurrentUserPoint,
-                        { left: `${Math.max(0, Math.min(100, position))}%` },
-                      ]}
-                    />
-                  );
-                })}
+                {/* Number labels below the line */}
+                <View style={styles.numberLineLabels}>
+                  {numberLineData.labels.length > 0 ? (
+                    numberLineData.labels.map((label, index) => (
+                      <Text key={index} style={styles.numberLineLabel}>
+                        {label}
+                      </Text>
+                    ))
+                  ) : (
+                    <Text style={styles.numberLineLabel}>0</Text>
+                  )}
+                </View>
               </View>
               <Text style={styles.chartCaption}>
                 Sperm Score distribution of all users
@@ -990,34 +1002,44 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: Spacing.sm,
   },
+  numberLineWrapper: {
+    minHeight: 200,
+  },
+  numberLineViewContainer: {
+    position: 'relative',
+    height: 120,
+    marginVertical: Spacing.base,
+    paddingHorizontal: Spacing.base,
+  },
   numberLine: {
     position: 'absolute',
-    top: 82,
-    left: Spacing.base,
-    right: Spacing.base,
+    top: 40,
+    left: 0,
+    right: 0,
     height: 2,
     justifyContent: 'center',
   },
   numberLineBar: {
     height: 2,
-    backgroundColor: Colors.grey300,
-    opacity: 0.8,
+    backgroundColor: Colors.black,
+    width: '100%',
   },
   numberLineContainer: {
     position: 'absolute',
-    top: 72,
-    left: Spacing.base,
-    right: Spacing.base,
-    height: 40,
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 80,
     alignItems: 'center',
   },
   numberLineLabels: {
     position: 'absolute',
-    top: 95,
-    left: Spacing.base,
-    right: Spacing.base,
+    top: 50,
+    left: 0,
+    right: 0,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    paddingHorizontal: 0,
   },
   numberLineLabel: {
     fontSize: Typography.size.xs,
@@ -1040,6 +1062,17 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     opacity: 1,
     top: 7,
+  },
+  emptyNumberLineMessage: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: Spacing.lg,
+  },
+  emptyNumberLineText: {
+    fontSize: Typography.size.sm,
+    color: Colors.textSecondary,
+    fontStyle: 'italic',
   },
   toggleContainer: {
     flexDirection: 'row',
