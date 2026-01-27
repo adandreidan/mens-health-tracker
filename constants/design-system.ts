@@ -1,7 +1,7 @@
 // Unified Design System - Black & White Color Scheme
 // Clean, elegant, professional aesthetic
 
-export const Colors = {
+const lightColors = {
     // Primary blacks and whites
     black: '#000000',
     white: '#FFFFFF',
@@ -48,6 +48,62 @@ export const Colors = {
     shadowMedium: 'rgba(0, 0, 0, 0.1)',
     shadowDark: 'rgba(0, 0, 0, 0.2)',
 };
+
+const darkColors = {
+    // Primary blacks and whites
+    black: '#FFFFFF',
+    white: '#000000',
+
+    // Greys (ordered from darkest to lightest) - inverted for dark mode
+    grey900: '#FAFAFA',
+    grey800: '#F5F5F5',
+    grey700: '#E5E5E5',
+    grey600: '#CCCCCC',
+    grey500: '#999999',
+    grey400: '#666666',
+    grey300: '#3A3A3A',
+    grey200: '#2A2A2A',
+    grey100: '#1A1A1A',
+    grey50: '#0A0A0A',
+
+    // Semantic colors (monochrome versions)
+    success: '#FFFFFF',
+    warning: '#999999',
+    error: '#CCCCCC',
+
+    // Status indicators
+    statusGood: '#FFFFFF',
+    statusWarning: '#999999',
+    statusBad: '#CCCCCC',
+
+    // Backgrounds
+    background: '#000000',
+    backgroundSecondary: '#0A0A0A',
+    backgroundTertiary: '#1A1A1A',
+
+    // Text
+    textPrimary: '#FFFFFF',
+    textSecondary: '#999999',
+    textTertiary: '#666666',
+    textInverse: '#000000',
+
+    // Borders
+    border: '#1A1A1A',
+    borderDark: '#2A2A2A',
+
+    // Shadows (used in elevation) - lighter shadows for dark mode
+    shadowLight: 'rgba(255, 255, 255, 0.05)',
+    shadowMedium: 'rgba(255, 255, 255, 0.1)',
+    shadowDark: 'rgba(255, 255, 255, 0.2)',
+};
+
+// Function to get colors based on theme
+export function getColors(theme: 'light' | 'dark' = 'light') {
+    return theme === 'dark' ? darkColors : lightColors;
+}
+
+// Default export for backward compatibility (light mode)
+export const Colors = lightColors;
 
 export const Typography = {
     // Font sizes

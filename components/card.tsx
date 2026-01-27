@@ -13,15 +13,19 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BorderRadius, Colors, Shadows, Spacing, Typography } from '../constants/design-system';
+import { BorderRadius, Colors, getColors, Shadows, Spacing, Typography } from '../constants/design-system';
+import { useTheme } from '../contexts/ThemeContext';
 import { calculateHealthCardData } from '../data/mens-health-references';
 import { LifestyleMetrics, MensHealthCardData, SemenQualityMetrics } from '../types/mens-health-types';
 import { deleteMensHealthCard, getSelectedCard, loadMensHealthCards, saveMensHealthCard, setSelectedCard } from '../utils/storage';
 import FlexingManLogo from './FlexingManLogo';
 import MensHealthCard from './MensHealthCard';
 import MensHealthCardForm from './MensHealthCardForm';
+import ThemeToggle from './ThemeToggle';
 
 export default function Card() {
+  const { colorScheme } = useTheme();
+  const colors = getColors(colorScheme);
   const [cards, setCards] = useState<MensHealthCardData[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -136,51 +140,52 @@ export default function Card() {
 
   if (loading) {
     return (
-      <View style={styles.centerContainer}>
+      <View style={[styles.centerContainer, { backgroundColor: colors.backgroundSecondary }]}>
         <ActivityIndicator size="large" color="#4CAF50" />
       </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.backgroundSecondary }]}>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerTop}>
             <FlexingManLogo size={60} />
-            <Text style={styles.title}>Men's Health Cards</Text>
+            <Text style={[styles.title, { color: colors.textPrimary }]}>Men's Health Cards</Text>
+            <ThemeToggle />
           </View>
           <View style={styles.headerButtons}>
             {!selectionMode && !deleteMode && cards.length > 0 && (
               <>
                 <TouchableOpacity
-                  style={styles.selectButton}
+                  style={[styles.selectButton, { backgroundColor: colors.white, borderColor: colors.black }]}
                   onPress={() => setSelectionMode(true)}
                 >
-                  <Text style={styles.selectButtonText}>Select for Rankings</Text>
+                  <Text style={[styles.selectButtonText, { color: colors.textPrimary }]}>Select for Rankings</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={styles.deleteModeButton}
+                  style={[styles.deleteModeButton, { backgroundColor: colors.error }]}
                   onPress={() => setDeleteMode(true)}
                 >
-                  <Text style={styles.deleteModeButtonText}>Delete Cards</Text>
+                  <Text style={[styles.deleteModeButtonText, { color: colors.white }]}>Delete Cards</Text>
                 </TouchableOpacity>
               </>
             )}
             {(selectionMode || deleteMode) && (
               <TouchableOpacity
-                style={styles.cancelSelectButton}
+                style={[styles.cancelSelectButton, { backgroundColor: colors.grey100 }]}
                 onPress={() => {
                   setSelectionMode(false);
                   setDeleteMode(false);
                 }}
               >
-                <Text style={styles.cancelSelectButtonText}>Cancel</Text>
+                <Text style={[styles.cancelSelectButtonText, { color: colors.textSecondary }]}>Cancel</Text>
               </TouchableOpacity>
             )}
-            <TouchableOpacity style={styles.createButton} onPress={() => setShowForm(true)}>
-              <Text style={styles.createButtonText}>+ Create New Card</Text>
+            <TouchableOpacity style={[styles.createButton, { backgroundColor: colors.black }]} onPress={() => setShowForm(true)}>
+              <Text style={[styles.createButtonText, { color: colors.white }]}>+ Create New Card</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -188,15 +193,15 @@ export default function Card() {
         {/* Empty State */}
         {cards.length === 0 && (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyStateTitle}>No cards yet</Text>
-            <Text style={styles.emptyStateText}>
+            <Text style={[styles.emptyStateTitle, { color: colors.textPrimary }]}>No cards yet</Text>
+            <Text style={[styles.emptyStateText, { color: colors.textSecondary }]}>
               Create your first Men's Health Card to track your semen quality and lifestyle metrics.
             </Text>
             <TouchableOpacity
-              style={styles.emptyStateButton}
+              style={[styles.emptyStateButton, { backgroundColor: colors.black }]}
               onPress={() => setShowForm(true)}
             >
-              <Text style={styles.emptyStateButtonText}>Create Your First Card</Text>
+              <Text style={[styles.emptyStateButtonText, { color: colors.white }]}>Create Your First Card</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -236,13 +241,11 @@ export default function Card() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.backgroundSecondary,
   },
   centerContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: Colors.backgroundSecondary,
   },
   scrollView: {
     flex: 1,
@@ -266,12 +269,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: Typography.size.xxxl,
     fontWeight: Typography.weight.bold,
-    color: Colors.black,
     letterSpacing: -1,
     flex: 1,
   },
   createButton: {
-    backgroundColor: Colors.black,
     paddingVertical: Spacing.md,
     paddingHorizontal: Spacing.lg,
     borderRadius: BorderRadius.md,
@@ -279,15 +280,12 @@ const styles = StyleSheet.create({
     ...Shadows.sm,
   },
   createButtonText: {
-    color: Colors.white,
     fontSize: Typography.size.base,
     fontWeight: Typography.weight.semibold,
     letterSpacing: 0.5,
   },
   selectButton: {
-    backgroundColor: Colors.white,
     borderWidth: 1,
-    borderColor: Colors.black,
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.md,
     borderRadius: BorderRadius.md,
@@ -295,13 +293,11 @@ const styles = StyleSheet.create({
     ...Shadows.sm,
   },
   selectButtonText: {
-    color: Colors.black,
     fontSize: Typography.size.sm,
     fontWeight: Typography.weight.semibold,
     letterSpacing: 0.5,
   },
   cancelSelectButton: {
-    backgroundColor: Colors.grey100,
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.md,
     borderRadius: BorderRadius.md,
@@ -309,13 +305,11 @@ const styles = StyleSheet.create({
     ...Shadows.sm,
   },
   cancelSelectButtonText: {
-    color: Colors.textSecondary,
     fontSize: Typography.size.sm,
     fontWeight: Typography.weight.semibold,
     letterSpacing: 0.5,
   },
   deleteModeButton: {
-    backgroundColor: Colors.error || '#FF3B30',
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.md,
     borderRadius: BorderRadius.md,
@@ -323,7 +317,6 @@ const styles = StyleSheet.create({
     ...Shadows.sm,
   },
   deleteModeButtonText: {
-    color: Colors.white,
     fontSize: Typography.size.sm,
     fontWeight: Typography.weight.semibold,
     letterSpacing: 0.5,
@@ -337,25 +330,21 @@ const styles = StyleSheet.create({
   emptyStateTitle: {
     fontSize: Typography.size.xxl,
     fontWeight: Typography.weight.bold,
-    color: Colors.black,
     marginBottom: Spacing.md,
   },
   emptyStateText: {
     fontSize: Typography.size.base,
-    color: Colors.textSecondary,
     textAlign: 'center',
     marginBottom: Spacing.xxl,
     lineHeight: Typography.size.base * Typography.lineHeight.relaxed,
   },
   emptyStateButton: {
-    backgroundColor: Colors.black,
     paddingVertical: Spacing.base,
     paddingHorizontal: Spacing.xxl,
     borderRadius: BorderRadius.md,
     ...Shadows.md,
   },
   emptyStateButtonText: {
-    color: Colors.white,
     fontSize: Typography.size.base,
     fontWeight: Typography.weight.semibold,
     letterSpacing: 0.5,
