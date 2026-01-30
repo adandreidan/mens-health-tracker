@@ -393,8 +393,10 @@ export default function Leaderboard() {
         // Add current user from health card if available
         if (cardScore !== null) {
           const currentUserRank = allScores.filter(s => s > cardScore).length + 1;
+          // Use card name if available, otherwise use a default
+          const cardName = mensHealthCard?.name || 'Andrew';
           leaderboard.push({
-            user_id: 'current_user',
+            user_id: cardName,
             overall_score: cardScore,
             rank: currentUserRank,
             percentile: calculatePercentile(cardScore, allScores),
@@ -547,7 +549,11 @@ export default function Leaderboard() {
     };
   };
 
-  const currentUser = leaderboardData.find(item => item.user_id === CURRENT_USER_ID);
+  // Find current user by card name or fallback to CURRENT_USER_ID
+  const currentUserCardName = mensHealthCard?.name || 'Andrew';
+  const currentUser = leaderboardData.find(item => 
+    item.user_id === currentUserCardName || item.user_id === CURRENT_USER_ID
+  );
   const currentUserScore = mensHealthCard ? mensHealthCard.overallHealthIndex : null;
   const chartData = generateChartData();
   const numberLineData = generateNumberLineData();
@@ -677,7 +683,9 @@ export default function Leaderboard() {
               {chartData.currentUserPoint && (
                 <View style={styles.currentUserMarkerAboveChart}>
                   <View style={styles.currentUserMarker}>
-                    <Text style={styles.currentUserMarkerText}>You</Text>
+                    <Text style={styles.currentUserMarkerText}>
+                      {mensHealthCard?.name || 'Andrew'}
+                    </Text>
                     <Text style={styles.currentUserMarkerScore}>
                       {chartData.currentUserPoint.score} points
                     </Text>
@@ -744,7 +752,9 @@ export default function Leaderboard() {
               {chartData.currentUserPoint && (
                 <View style={styles.currentUserMarkerAboveChart}>
                   <View style={styles.currentUserMarker}>
-                    <Text style={styles.currentUserMarkerText}>You</Text>
+                    <Text style={styles.currentUserMarkerText}>
+                      {mensHealthCard?.name || 'Andrew'}
+                    </Text>
                     <Text style={styles.currentUserMarkerScore}>
                       {chartData.currentUserPoint.score} points
                     </Text>
@@ -814,7 +824,7 @@ export default function Leaderboard() {
             {currentUser && (
               <View style={styles.currentUserMarker}>
                 <Text style={styles.currentUserMarkerText}>
-                  Your Position: {currentUser.overall_score.toFixed(1)}
+                  {mensHealthCard?.name || 'Andrew'}: {currentUser.overall_score.toFixed(1)}
                 </Text>
               </View>
             )}
@@ -829,7 +839,7 @@ export default function Leaderboard() {
               key={item.user_id}
               style={[
                 styles.leaderboardItem,
-                item.user_id === CURRENT_USER_ID && styles.currentUserHighlight,
+                (item.user_id === CURRENT_USER_ID || (mensHealthCard && item.user_id === (mensHealthCard?.name || 'Andrew'))) && styles.currentUserHighlight,
               ]}
             >
               <View style={styles.rankContainer}>
@@ -842,7 +852,9 @@ export default function Leaderboard() {
               </View>
               <View style={styles.userInfo}>
                 <Text style={styles.userId}>
-                  {item.user_id === CURRENT_USER_ID ? 'You' : item.user_id}
+                  {item.user_id === CURRENT_USER_ID || (mensHealthCard && item.user_id === (mensHealthCard?.name || 'Andrew')) 
+                    ? (mensHealthCard?.name || 'Andrew')
+                    : item.user_id}
                 </Text>
                 <Text style={styles.score}>{item.overall_score.toFixed(1)} pts</Text>
               </View>
