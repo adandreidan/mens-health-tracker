@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Dimensions,
   ScrollView,
   StyleSheet,
   Text,
@@ -12,8 +13,9 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { LineChart } from 'react-native-chart-kit';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BorderRadius, Colors, getColors, Shadows, Spacing, Typography } from '../constants/design-system';
+import { BorderRadius, getColors, Shadows, Spacing, Typography } from '../constants/design-system';
 import { useTheme } from '../contexts/ThemeContext';
 import { MoodEntry } from '../types/mood-types';
 import {
@@ -28,6 +30,8 @@ import {
   saveMoodEntry,
 } from '../utils/mood-storage';
 
+const { width: screenWidth } = Dimensions.get('window');
+
 export default function MoodCheckIn() {
   const { colorScheme } = useTheme();
   const colors = getColors(colorScheme);
@@ -41,6 +45,7 @@ export default function MoodCheckIn() {
   const [sevenDayAvg, setSevenDayAvg] = useState(0);
   const [thirtyDayAvg, setThirtyDayAvg] = useState(0);
   const [trendMessage, setTrendMessage] = useState('');
+  const [chartPeriod, setChartPeriod] = useState<'7days' | '30days' | 'all'>('30days');
 
   useEffect(() => {
     loadData();
@@ -63,9 +68,9 @@ export default function MoodCheckIn() {
         }
       }
       
-      // Load recent entries
+      // Load recent entries (load all for chart, but display last 30 in list)
       const entries = await loadMoodEntries();
-      setRecentEntries(entries.slice(0, 30)); // Show last 30 entries
+      setRecentEntries(entries); // Load all entries for chart
       
       // Calculate averages and trends
       const last7Days = await getLast7DaysMoods();
@@ -192,6 +197,102 @@ export default function MoodCheckIn() {
       year: date.getFullYear() !== today.getFullYear() ? 'numeric' : undefined 
     });
   };
+
+  // Generate chart data based on selected period
+  const generateChartData = () => {
+    let entriesToUse: MoodEntry[] = [];
+    
+    switch (chartPeriod) {
+      case '7days':
+        entriesToUse = recentEntries.filter(entry => {
+          const entryDate = new Date(entry.date + 'T00:00:00');
+          const cutoffDate = new Date();
+          cutoffDate.setDate(cutoffDate.getDate() - 7);
+          return entryDate >= cutoffDate;
+        });
+        break;
+      case '30days':
+        entriesToUse = recentEntries.filter(entry => {
+          const entryDate = new Date(entry.date + 'T00:00:00');
+          const cutoffDate = new Date();
+          cutoffDate.setDate(cutoffDate.getDate() - 30);
+          return entryDate >= cutoffDate;
+        });
+        break;
+      case 'all':
+        entriesToUse = recentEntries;
+        break;
+    }
+
+    if (entriesToUse.length === 0) {
+      return null;
+    }
+
+    // Sort by date (oldest first for chart)
+    const sortedEntries = [...entriesToUse].sort((a, b) => 
+      new Date(a.date).getTime() - new Date(b.date).getTime()
+    );
+
+    // Create labels and data points
+    const labels: string[] = [];
+    const dataPoints: number[] = [];
+
+    sortedEntries.forEach((entry) => {
+      const date = new Date(entry.date + 'T00:00:00');
+      // Format label based on period
+      if (chartPeriod === '7days') {
+        labels.push(date.toLocaleDateString('en-US', { weekday: 'short' }));
+      } else if (chartPeriod === '30days') {
+        labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+      } else {
+        labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' }));
+      }
+      dataPoints.push(entry.moodScore);
+    });
+
+    // Limit labels to show every Nth entry to avoid crowding
+    const maxLabels = chartPeriod === '7days' ? 7 : chartPeriod === '30days' ? 10 : 20;
+    if (labels.length > maxLabels) {
+      const step = Math.ceil(labels.length / maxLabels);
+      const filteredLabels: string[] = [];
+      const filteredData: number[] = [];
+      
+      for (let i = 0; i < labels.length; i += step) {
+        filteredLabels.push(labels[i]);
+        filteredData.push(dataPoints[i]);
+      }
+      
+      // Always include the last point
+      if (filteredLabels.length === 0 || filteredLabels[filteredLabels.length - 1] !== labels[labels.length - 1]) {
+        filteredLabels.push(labels[labels.length - 1]);
+        filteredData.push(dataPoints[dataPoints.length - 1]);
+      }
+      
+      return {
+        labels: filteredLabels,
+        datasets: [{
+          data: filteredData,
+          color: (opacity = 1) => colorScheme === 'dark' 
+            ? `rgba(255, 255, 255, ${opacity})` 
+            : `rgba(0, 0, 0, ${opacity})`,
+          strokeWidth: 2,
+        }],
+      };
+    }
+
+    return {
+      labels,
+      datasets: [{
+        data: dataPoints,
+        color: (opacity = 1) => colorScheme === 'dark' 
+          ? `rgba(255, 255, 255, ${opacity})` 
+          : `rgba(0, 0, 0, ${opacity})`,
+        strokeWidth: 2,
+      }],
+    };
+  };
+
+  const chartData = generateChartData();
 
   if (isLoading) {
     return (
@@ -326,6 +427,123 @@ export default function MoodCheckIn() {
           )}
         </View>
 
+        {/* Mood History Chart */}
+        {chartData && recentEntries.length > 0 && (
+          <View style={[styles.card, { backgroundColor: colors.white, borderColor: colors.border }]}>
+            <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>Mood History</Text>
+            
+            {/* Period Toggle */}
+            <View style={[styles.periodToggle, { backgroundColor: colors.backgroundSecondary }]}>
+              <TouchableOpacity
+                style={[
+                  styles.periodButton,
+                  chartPeriod === '7days' && { backgroundColor: colors.black },
+                ]}
+                onPress={() => setChartPeriod('7days')}
+              >
+                <Text
+                  style={[
+                    styles.periodButtonText,
+                    { color: chartPeriod === '7days' ? colors.white : colors.textSecondary },
+                  ]}
+                >
+                  7 Days
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.periodButton,
+                  chartPeriod === '30days' && { backgroundColor: colors.black },
+                ]}
+                onPress={() => setChartPeriod('30days')}
+              >
+                <Text
+                  style={[
+                    styles.periodButtonText,
+                    { color: chartPeriod === '30days' ? colors.white : colors.textSecondary },
+                  ]}
+                >
+                  30 Days
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.periodButton,
+                  chartPeriod === 'all' && { backgroundColor: colors.black },
+                ]}
+                onPress={() => setChartPeriod('all')}
+              >
+                <Text
+                  style={[
+                    styles.periodButtonText,
+                    { color: chartPeriod === 'all' ? colors.white : colors.textSecondary },
+                  ]}
+                >
+                  All Time
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Chart */}
+            <View style={styles.chartContainer}>
+              <LineChart
+                data={chartData}
+                width={screenWidth - Spacing.base * 4}
+                height={220}
+                chartConfig={{
+                  backgroundColor: colors.white,
+                  backgroundGradientFrom: colors.white,
+                  backgroundGradientTo: colors.white,
+                  decimalPlaces: 1,
+                  color: (opacity = 1) => colorScheme === 'dark' 
+                    ? `rgba(255, 255, 255, ${opacity})` 
+                    : `rgba(0, 0, 0, ${opacity})`,
+                  labelColor: (opacity = 1) => colorScheme === 'dark'
+                    ? `rgba(255, 255, 255, ${opacity})`
+                    : `rgba(0, 0, 0, ${opacity})`,
+                  style: {
+                    borderRadius: 0,
+                  },
+                  propsForDots: {
+                    r: '5',
+                    fill: colorScheme === 'dark' ? '#FFFFFF' : '#000000',
+                  },
+                  propsForBackgroundLines: {
+                    strokeDasharray: '',
+                    stroke: colorScheme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+                  },
+                }}
+                bezier
+                style={{
+                  marginVertical: 8,
+                  borderRadius: BorderRadius.md,
+                }}
+                withDots={true}
+                withShadow={false}
+                withInnerLines={true}
+                withOuterLines={true}
+                withVerticalLines={false}
+                withHorizontalLines={true}
+                segments={4}
+                yAxisLabel=""
+                yAxisSuffix=""
+                yAxisInterval={1}
+                fromZero={false}
+              />
+            </View>
+
+            {/* Chart Legend */}
+            <View style={styles.chartLegend}>
+              <View style={styles.legendItem}>
+                <View style={[styles.legendDot, { backgroundColor: colors.black }]} />
+                <Text style={[styles.legendText, { color: colors.textSecondary }]}>
+                  Mood Score (1-5)
+                </Text>
+              </View>
+            </View>
+          </View>
+        )}
+
         {/* Insights Summary */}
         {(sevenDayAvg > 0 || thirtyDayAvg > 0) && (
           <View style={[styles.card, { backgroundColor: colors.white, borderColor: colors.border }]}>
@@ -371,7 +589,7 @@ export default function MoodCheckIn() {
             <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>Recent Moods</Text>
             
             <View style={styles.moodsList}>
-              {recentEntries.map((entry) => (
+              {recentEntries.slice(0, 30).map((entry) => (
                 <View
                   key={entry.id}
                   style={[
@@ -612,5 +830,45 @@ const styles = StyleSheet.create({
   emptyStateText: {
     fontSize: Typography.size.base,
     textAlign: 'center',
+  },
+  periodToggle: {
+    flexDirection: 'row',
+    borderRadius: BorderRadius.md,
+    padding: Spacing.xs,
+    marginBottom: Spacing.md,
+    gap: Spacing.xs,
+  },
+  periodButton: {
+    flex: 1,
+    paddingVertical: Spacing.sm,
+    borderRadius: BorderRadius.sm,
+    alignItems: 'center',
+  },
+  periodButtonText: {
+    fontSize: Typography.size.sm,
+    fontWeight: Typography.weight.medium,
+  },
+  chartContainer: {
+    alignItems: 'center',
+    marginVertical: Spacing.sm,
+  },
+  chartLegend: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: Spacing.sm,
+    gap: Spacing.md,
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+  },
+  legendDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  legendText: {
+    fontSize: Typography.size.xs,
   },
 });
