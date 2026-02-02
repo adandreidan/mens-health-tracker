@@ -10,7 +10,8 @@ import {
 } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BorderRadius, Colors, Shadows, Spacing, Typography } from '../constants/design-system';
+import { BorderRadius, Colors, getColors, getShadows, Shadows, Spacing, Typography } from '../constants/design-system';
+import { useTheme } from '../contexts/ThemeContext';
 import { getSelectedCard } from '../utils/storage';
 import { hormoneData, currentUserData as importedCurrentUserData, participantData, semenData, serumFattyAcids, spermFattyAcids } from './data';
 
@@ -171,6 +172,9 @@ const calculatePercentile = (score: number, allScores: number[]): number => {
 };
 
 export default function Leaderboard() {
+  const { colorScheme } = useTheme();
+  const colors = getColors(colorScheme);
+  const shadows = getShadows(colorScheme);
   const [userData, setUserData] = useState<UserData[]>([]);
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -560,37 +564,37 @@ export default function Leaderboard() {
 
   if (isLoading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={Colors.black} />
-        <Text style={styles.loadingText}>Loading leaderboard data...</Text>
+      <View style={[styles.loadingContainer, { backgroundColor: colors.backgroundSecondary }]}>
+        <ActivityIndicator size="large" color={colors.textPrimary} />
+        <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Loading leaderboard data...</Text>
       </View>
     );
   }
 
   if (error) {
     return (
-      <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>{error}</Text>
+      <View style={[styles.errorContainer, { backgroundColor: colors.backgroundSecondary }]}>
+        <Text style={[styles.errorText, { color: colors.error }]}>{error}</Text>
       </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.backgroundSecondary }]}>
       <ScrollView style={styles.scrollView}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Your Fertility Score </Text>
-          <Text style={styles.subtitle}>See how you compare to other men</Text>
+        <View style={[styles.header, { backgroundColor: colors.white, borderBottomColor: colors.border }]}>
+          <Text style={[styles.title, { color: colors.textPrimary }]}>Your Fertility Score </Text>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>See how you compare to other men</Text>
         </View>
 
         {/* Current User Card - Only show when health card exists */}
         {mensHealthCard && currentUser && (
-          <View style={styles.currentUserCard}>
-            <Text style={styles.currentUserTitle}>Your Position</Text>
-            <Text style={styles.currentUserScore}>
+          <View style={[styles.currentUserCard, { backgroundColor: colors.black }, shadows.lg]}>
+            <Text style={[styles.currentUserTitle, { color: colors.white }]}>Your Position</Text>
+            <Text style={[styles.currentUserScore, { color: colors.white }]}>
               Rank #{currentUser.rank} • {currentUser.overall_score.toFixed(1)} points
             </Text>
-            <Text style={styles.currentUserPercentile}>
+            <Text style={[styles.currentUserPercentile, { color: colors.white }]}>
               Top {currentUser.percentile.toFixed(1)}% of users
             </Text>
           </View>
@@ -598,80 +602,94 @@ export default function Leaderboard() {
 
         {/* Current User Detailed Metrics - Only show when health card exists */}
         {mensHealthCard && (
-          <View style={styles.currentUserMetrics}>
-            <Text style={styles.metricsTitle}>Your Stats</Text>
+          <View style={[styles.currentUserMetrics, { backgroundColor: colors.backgroundTertiary, borderColor: colors.border }]}>
+            <Text style={[styles.metricsTitle, { color: colors.textPrimary }]}>Your Stats</Text>
             <View style={styles.metricsGrid}>
-              <View style={styles.metricItem}>
-                <Text style={styles.metricLabel}>Health Index</Text>
-                <Text style={styles.metricValue}>{mensHealthCard.overallHealthIndex}/100</Text>
+              <View style={[styles.metricItem, { backgroundColor: colors.white }, shadows.sm]}>
+                <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>Health Index</Text>
+                <Text style={[styles.metricValue, { color: colors.textPrimary }]}>{mensHealthCard.overallHealthIndex}/100</Text>
               </View>
-              <View style={styles.metricItem}>
-                <Text style={styles.metricLabel}>Sperm Conc.</Text>
-                <Text style={styles.metricValue}>{mensHealthCard.semenQuality.spermConcentration}M/mL</Text>
+              <View style={[styles.metricItem, { backgroundColor: colors.white }, shadows.sm]}>
+                <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>Sperm Conc.</Text>
+                <Text style={[styles.metricValue, { color: colors.textPrimary }]}>{mensHealthCard.semenQuality.spermConcentration}M/mL</Text>
               </View>
-              <View style={styles.metricItem}>
-                <Text style={styles.metricLabel}>Total Count</Text>
-                <Text style={styles.metricValue}>{mensHealthCard.semenQuality.totalSpermCount}M</Text>
+              <View style={[styles.metricItem, { backgroundColor: colors.white }, shadows.sm]}>
+                <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>Total Count</Text>
+                <Text style={[styles.metricValue, { color: colors.textPrimary }]}>{mensHealthCard.semenQuality.totalSpermCount}M</Text>
               </View>
-              <View style={styles.metricItem}>
-                <Text style={styles.metricLabel}>Motility</Text>
-                <Text style={styles.metricValue}>{mensHealthCard.semenQuality.progressiveMotility}%</Text>
+              <View style={[styles.metricItem, { backgroundColor: colors.white }, shadows.sm]}>
+                <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>Motility</Text>
+                <Text style={[styles.metricValue, { color: colors.textPrimary }]}>{mensHealthCard.semenQuality.progressiveMotility}%</Text>
               </View>
-              <View style={styles.metricItem}>
-                <Text style={styles.metricLabel}>Morphology</Text>
-                <Text style={styles.metricValue}>{mensHealthCard.semenQuality.normalMorphology}%</Text>
+              <View style={[styles.metricItem, { backgroundColor: colors.white }, shadows.sm]}>
+                <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>Morphology</Text>
+                <Text style={[styles.metricValue, { color: colors.textPrimary }]}>{mensHealthCard.semenQuality.normalMorphology}%</Text>
               </View>
-              <View style={styles.metricItem}>
-                <Text style={styles.metricLabel}>Volume</Text>
-                <Text style={styles.metricValue}>{mensHealthCard.semenQuality.semenVolume}mL</Text>
+              <View style={[styles.metricItem, { backgroundColor: colors.white }, shadows.sm]}>
+                <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>Volume</Text>
+                <Text style={[styles.metricValue, { color: colors.textPrimary }]}>{mensHealthCard.semenQuality.semenVolume}mL</Text>
               </View>
-              <View style={styles.metricItem}>
-                <Text style={styles.metricLabel}>Lifestyle Score</Text>
-                <Text style={styles.metricValue}>{Math.round(mensHealthCard.lifestyleScore)}/100</Text>
+              <View style={[styles.metricItem, { backgroundColor: colors.white }, shadows.sm]}>
+                <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>Lifestyle Score</Text>
+                <Text style={[styles.metricValue, { color: colors.textPrimary }]}>{Math.round(mensHealthCard.lifestyleScore)}/100</Text>
               </View>
-              <View style={styles.metricItem}>
-                <Text style={styles.metricLabel}>Smoking</Text>
-                <Text style={styles.metricValue}>{mensHealthCard.lifestyle.smokingStatus}</Text>
+              <View style={[styles.metricItem, { backgroundColor: colors.white }, shadows.sm]}>
+                <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>Smoking</Text>
+                <Text style={[styles.metricValue, { color: colors.textPrimary }]}>{mensHealthCard.lifestyle.smokingStatus}</Text>
               </View>
-              <View style={styles.metricItem}>
-                <Text style={styles.metricLabel}>Exercise</Text>
-                <Text style={styles.metricValue}>{mensHealthCard.lifestyle.weeklyExerciseMinutes}min/wk</Text>
+              <View style={[styles.metricItem, { backgroundColor: colors.white }, shadows.sm]}>
+                <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>Exercise</Text>
+                <Text style={[styles.metricValue, { color: colors.textPrimary }]}>{mensHealthCard.lifestyle.weeklyExerciseMinutes}min/wk</Text>
               </View>
-              <View style={styles.metricItem}>
-                <Text style={styles.metricLabel}>Sleep</Text>
-                <Text style={styles.metricValue}>{mensHealthCard.lifestyle.sleepHoursPerNight}hrs</Text>
+              <View style={[styles.metricItem, { backgroundColor: colors.white }, shadows.sm]}>
+                <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>Sleep</Text>
+                <Text style={[styles.metricValue, { color: colors.textPrimary }]}>{mensHealthCard.lifestyle.sleepHoursPerNight}hrs</Text>
               </View>
-              <View style={styles.metricItem}>
-                <Text style={styles.metricLabel}>Diet</Text>
-                <Text style={styles.metricValue}>{mensHealthCard.lifestyle.dietQuality}</Text>
+              <View style={[styles.metricItem, { backgroundColor: colors.white }, shadows.sm]}>
+                <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>Diet</Text>
+                <Text style={[styles.metricValue, { color: colors.textPrimary }]}>{mensHealthCard.lifestyle.dietQuality}</Text>
               </View>
-              <View style={styles.metricItem}>
-                <Text style={styles.metricLabel}>Alcohol Risk</Text>
-                <Text style={styles.metricValue}>{mensHealthCard.lifestyle.alcoholRiskLevel}</Text>
+              <View style={[styles.metricItem, { backgroundColor: colors.white }, shadows.sm]}>
+                <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>Alcohol Risk</Text>
+                <Text style={[styles.metricValue, { color: colors.textPrimary }]}>{mensHealthCard.lifestyle.alcoholRiskLevel}</Text>
               </View>
             </View>
           </View>
         )}
 
         {/* Score Distribution Chart with Toggle */}
-        <View style={styles.chartContainer}>
-          <Text style={styles.chartTitle}>Score Distribution</Text>
+        <View style={[styles.chartContainer, { backgroundColor: colors.white }, shadows.md]}>
+          <Text style={[styles.chartTitle, { color: colors.textPrimary }]}>Score Distribution</Text>
 
           {/* Toggle Buttons */}
-          <View style={styles.toggleContainer}>
+          <View style={[styles.toggleContainer, { backgroundColor: colors.grey100 }]}>
             <TouchableOpacity
-              style={[styles.toggleButton, chartView === 'bell' && styles.toggleButtonActive]}
+              style={[
+                styles.toggleButton,
+                chartView === 'bell' && { backgroundColor: colors.black },
+                chartView === 'bell' && shadows.sm,
+              ]}
               onPress={() => setChartView('bell')}
             >
-              <Text style={[styles.toggleButtonText, chartView === 'bell' && styles.toggleButtonTextActive]}>
+              <Text style={[
+                styles.toggleButtonText,
+                { color: chartView === 'bell' ? colors.white : colors.textSecondary },
+              ]}>
                 Distribution
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.toggleButton, chartView === 'histogram' && styles.toggleButtonActive]}
+              style={[
+                styles.toggleButton,
+                chartView === 'histogram' && { backgroundColor: colors.black },
+                chartView === 'histogram' && shadows.sm,
+              ]}
               onPress={() => setChartView('histogram')}
             >
-              <Text style={[styles.toggleButtonText, chartView === 'histogram' && styles.toggleButtonTextActive]}>
+              <Text style={[
+                styles.toggleButtonText,
+                { color: chartView === 'histogram' ? colors.white : colors.textSecondary },
+              ]}>
                 Number Line
               </Text>
             </TouchableOpacity>
@@ -702,12 +720,16 @@ export default function Leaderboard() {
                   width={screenWidth + 40}
                   height={180}
                   chartConfig={{
-                    backgroundColor: Colors.white,
-                    backgroundGradientFrom: Colors.white,
-                    backgroundGradientTo: Colors.white,
+                    backgroundColor: colors.white,
+                    backgroundGradientFrom: colors.white,
+                    backgroundGradientTo: colors.white,
                     decimalPlaces: 1,
-                    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                    color: (opacity = 1) => colorScheme === 'dark' 
+                      ? `rgba(0, 255, 229, ${opacity})` 
+                      : `rgba(0, 0, 0, ${opacity})`,
+                    labelColor: (opacity = 1) => colorScheme === 'dark'
+                      ? `rgba(136, 176, 255, ${opacity})`
+                      : `rgba(0, 0, 0, ${opacity})`,
                     style: {
                       borderRadius: 0,
                     },
@@ -751,14 +773,14 @@ export default function Leaderboard() {
               {/* Current User Marker - Above Number Line */}
               {chartData.currentUserPoint && (
                 <View style={styles.currentUserMarkerAboveChart}>
-                  <View style={styles.currentUserMarker}>
-                    <Text style={styles.currentUserMarkerText}>
+                  <View style={[styles.currentUserMarker, { backgroundColor: colors.black }, shadows.lg]}>
+                    <Text style={[styles.currentUserMarkerText, { color: colors.white }]}>
                       {mensHealthCard?.name || 'Andrew'}
                     </Text>
-                    <Text style={styles.currentUserMarkerScore}>
+                    <Text style={[styles.currentUserMarkerScore, { color: colors.white }]}>
                       {chartData.currentUserPoint.score} points
                     </Text>
-                    <Text style={styles.currentUserPercentile}>
+                    <Text style={[styles.currentUserPercentile, { color: colors.white }]}>
                       {chartData.currentUserPoint.percentile}th percentile
                     </Text>
                   </View>
@@ -767,10 +789,10 @@ export default function Leaderboard() {
 
               {/* Number Line Container with relative positioning */}
               <View style={styles.numberLineViewContainer}>
-                {/* Visible horizontal line through the dots */}
-                <View style={styles.numberLine}>
-                  <View style={styles.numberLineBar} />
-                </View>
+              {/* Visible horizontal line through the dots */}
+              <View style={styles.numberLine}>
+                <View style={[styles.numberLineBar, { backgroundColor: colorScheme === 'dark' ? colors.textPrimary : colors.black }]} />
+              </View>
 
                 {/* Individual user points on number line */}
                 <View style={styles.numberLineContainer}>
@@ -783,13 +805,22 @@ export default function Leaderboard() {
                       const scoreRange = maxScore - minScore;
                       const position = scoreRange > 0 ? ((point.x - minScore) / scoreRange) * 100 : 50;
 
+                      const isCurrentUser = Math.abs(point.x - (currentUserScore || 0)) < 0.5;
                       return (
                         <View
                           key={index}
                           style={[
                             styles.numberLinePoint,
-                            Math.abs(point.x - (currentUserScore || 0)) < 0.5 && styles.numberLineCurrentUserPoint,
-                            { left: `${Math.max(0, Math.min(100, position))}%` },
+                            {
+                              backgroundColor: isCurrentUser 
+                                ? (colorScheme === 'dark' ? colors.success : colors.black)
+                                : (colorScheme === 'dark' ? colors.grey500 : colors.grey500),
+                              left: `${Math.max(0, Math.min(100, position))}%`,
+                            },
+                            isCurrentUser && [
+                              styles.numberLineCurrentUserPoint,
+                              colorScheme === 'dark' && shadows.md,
+                            ],
                           ]}
                         />
                       );
@@ -805,16 +836,16 @@ export default function Leaderboard() {
                 <View style={styles.numberLineLabels}>
                   {numberLineData.labels.length > 0 ? (
                     numberLineData.labels.map((label, index) => (
-                      <Text key={index} style={styles.numberLineLabel}>
+                      <Text key={index} style={[styles.numberLineLabel, { color: colors.textSecondary }]}>
                         {label}
                       </Text>
                     ))
                   ) : (
-                    <Text style={styles.numberLineLabel}>0</Text>
+                    <Text style={[styles.numberLineLabel, { color: colors.textSecondary }]}>0</Text>
                   )}
                 </View>
               </View>
-              <Text style={styles.chartCaption}>
+              <Text style={[styles.chartCaption, { color: colors.textSecondary }]}>
                 Sperm Score distribution of all users
               </Text>
             </View>
@@ -822,8 +853,8 @@ export default function Leaderboard() {
 
           <View style={styles.currentUserIndicator}>
             {currentUser && (
-              <View style={styles.currentUserMarker}>
-                <Text style={styles.currentUserMarkerText}>
+              <View style={[styles.currentUserMarker, { backgroundColor: colors.black }, shadows.md]}>
+                <Text style={[styles.currentUserMarkerText, { color: colors.white }]}>
                   {mensHealthCard?.name || 'Andrew'}: {currentUser.overall_score.toFixed(1)}
                 </Text>
               </View>
@@ -833,32 +864,39 @@ export default function Leaderboard() {
 
         {/* Leaderboard List */}
         <View style={styles.leaderboardContainer}>
-          <Text style={styles.leaderboardTitle}>Top Performers</Text>
+          <Text style={[styles.leaderboardTitle, { color: colors.textPrimary }]}>Top Performers</Text>
           {leaderboardData.slice(0, 10).map((item) => (
             <View
               key={item.user_id}
               style={[
                 styles.leaderboardItem,
-                (item.user_id === CURRENT_USER_ID || (mensHealthCard && item.user_id === (mensHealthCard?.name || 'Andrew'))) && styles.currentUserHighlight,
+                { backgroundColor: colors.white },
+                shadows.sm,
+                (item.user_id === CURRENT_USER_ID || (mensHealthCard && item.user_id === (mensHealthCard?.name || 'Andrew'))) && [
+                  styles.currentUserHighlight,
+                  { backgroundColor: colors.black },
+                  shadows.lg,
+                ],
               ]}
             >
               <View style={styles.rankContainer}>
                 <Text style={[
                   styles.rank,
+                  { color: (item.user_id === CURRENT_USER_ID || (mensHealthCard && item.user_id === (mensHealthCard?.name || 'Andrew'))) ? colors.white : colors.textPrimary },
                   item.rank <= 3 && styles.topRank,
                 ]}>
                   #{item.rank}
                 </Text>
               </View>
               <View style={styles.userInfo}>
-                <Text style={styles.userId}>
+                <Text style={[styles.userId, { color: (item.user_id === CURRENT_USER_ID || (mensHealthCard && item.user_id === (mensHealthCard?.name || 'Andrew'))) ? colors.white : colors.textPrimary }]}>
                   {item.user_id === CURRENT_USER_ID || (mensHealthCard && item.user_id === (mensHealthCard?.name || 'Andrew')) 
                     ? (mensHealthCard?.name || 'Andrew')
                     : item.user_id}
                 </Text>
-                <Text style={styles.score}>{item.overall_score.toFixed(1)} pts</Text>
+                <Text style={[styles.score, { color: (item.user_id === CURRENT_USER_ID || (mensHealthCard && item.user_id === (mensHealthCard?.name || 'Andrew'))) ? colors.white : colors.textPrimary }]}>{item.overall_score.toFixed(1)} pts</Text>
               </View>
-              <Text style={styles.percentile}>
+              <Text style={[styles.percentile, { color: (item.user_id === CURRENT_USER_ID || (mensHealthCard && item.user_id === (mensHealthCard?.name || 'Andrew'))) ? colors.white : colors.textPrimary }]}>
                 Top {item.percentile.toFixed(1)}%
               </Text>
             </View>

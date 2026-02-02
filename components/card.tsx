@@ -13,7 +13,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BorderRadius, Colors, getColors, Shadows, Spacing, Typography } from '../constants/design-system';
+import { BorderRadius, Colors, getColors, getShadows, Shadows, Spacing, Typography } from '../constants/design-system';
 import { useTheme } from '../contexts/ThemeContext';
 import { calculateHealthCardData } from '../data/mens-health-references';
 import { LifestyleMetrics, MensHealthCardData, SemenQualityMetrics } from '../types/mens-health-types';
@@ -26,6 +26,7 @@ import ThemeToggle from './ThemeToggle';
 export default function Card() {
   const { colorScheme } = useTheme();
   const colors = getColors(colorScheme);
+  const shadows = getShadows(colorScheme);
   const [cards, setCards] = useState<MensHealthCardData[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -160,13 +161,13 @@ export default function Card() {
             {!selectionMode && !deleteMode && cards.length > 0 && (
               <>
                 <TouchableOpacity
-                  style={[styles.selectButton, { backgroundColor: colors.white, borderColor: colors.black }]}
+                  style={[styles.selectButton, { backgroundColor: colors.white, borderColor: colors.black }, shadows.sm]}
                   onPress={() => setSelectionMode(true)}
                 >
                   <Text style={[styles.selectButtonText, { color: colors.textPrimary }]}>Select for Rankings</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={[styles.deleteModeButton, { backgroundColor: colors.error }]}
+                  style={[styles.deleteModeButton, { backgroundColor: colors.error }, shadows.sm]}
                   onPress={() => setDeleteMode(true)}
                 >
                   <Text style={[styles.deleteModeButtonText, { color: colors.white }]}>Delete Cards</Text>
@@ -184,7 +185,7 @@ export default function Card() {
                 <Text style={[styles.cancelSelectButtonText, { color: colors.textSecondary }]}>Cancel</Text>
               </TouchableOpacity>
             )}
-            <TouchableOpacity style={[styles.createButton, { backgroundColor: colors.black }]} onPress={() => setShowForm(true)}>
+            <TouchableOpacity style={[styles.createButton, { backgroundColor: colors.black }, shadows.md]} onPress={() => setShowForm(true)}>
               <Text style={[styles.createButtonText, { color: colors.white }]}>+ Create New Card</Text>
             </TouchableOpacity>
           </View>
@@ -198,7 +199,7 @@ export default function Card() {
               Create your first Men's Health Card to track your semen quality and lifestyle metrics.
             </Text>
             <TouchableOpacity
-              style={[styles.emptyStateButton, { backgroundColor: colors.black }]}
+              style={[styles.emptyStateButton, { backgroundColor: colors.black }, shadows.md]}
               onPress={() => setShowForm(true)}
             >
               <Text style={[styles.emptyStateButtonText, { color: colors.white }]}>Create Your First Card</Text>

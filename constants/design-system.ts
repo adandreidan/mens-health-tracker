@@ -50,51 +50,51 @@ const lightColors = {
 };
 
 const darkColors = {
-    // Primary blacks and whites
+    // Primary blacks and whites with glow
     black: '#FFFFFF',
-    white: '#000000',
+    white: '#0A0A0F',
 
-    // Greys (ordered from darkest to lightest) - inverted for dark mode
-    grey900: '#FAFAFA',
-    grey800: '#F5F5F5',
-    grey700: '#E5E5E5',
-    grey600: '#CCCCCC',
-    grey500: '#999999',
-    grey400: '#666666',
-    grey300: '#3A3A3A',
-    grey200: '#2A2A2A',
-    grey100: '#1A1A1A',
-    grey50: '#0A0A0A',
+    // Greys with subtle glow tints
+    grey900: '#E8F0FF', // Very light with blue glow
+    grey800: '#D0E0FF', // Light with blue glow
+    grey700: '#B8D0FF', // Medium-light with blue glow
+    grey600: '#A0C0FF', // Medium with blue glow
+    grey500: '#88B0FF', // Medium-bright with blue glow
+    grey400: '#70A0FF', // Bright with blue glow
+    grey300: '#2A3A5A', // Dark with blue tint
+    grey200: '#1A2A4A', // Darker with blue tint
+    grey100: '#0F1A2A', // Very dark with blue tint
+    grey50: '#0A0F1A', // Darkest with blue tint
 
-    // Semantic colors (monochrome versions)
-    success: '#FFFFFF',
-    warning: '#999999',
-    error: '#CCCCCC',
+    // Semantic colors with glow
+    success: '#00FFE5', // Cyan glow
+    warning: '#FFD700', // Gold glow
+    error: '#FF6B6B', // Red glow
 
-    // Status indicators
-    statusGood: '#FFFFFF',
-    statusWarning: '#999999',
-    statusBad: '#CCCCCC',
+    // Status indicators with glow
+    statusGood: '#00FFE5', // Cyan glow
+    statusWarning: '#FFD700', // Gold glow
+    statusBad: '#FF6B6B', // Red glow
 
-    // Backgrounds
-    background: '#000000',
-    backgroundSecondary: '#0A0A0A',
-    backgroundTertiary: '#1A1A1A',
+    // Backgrounds with subtle glow
+    background: '#0A0F1A', // Deep dark blue-black
+    backgroundSecondary: '#0F1520', // Slightly lighter dark blue-black
+    backgroundTertiary: '#141A25', // Even lighter dark blue-black
 
-    // Text
-    textPrimary: '#FFFFFF',
-    textSecondary: '#999999',
-    textTertiary: '#666666',
-    textInverse: '#000000',
+    // Text with glow
+    textPrimary: '#E8F0FF', // Bright white with blue glow
+    textSecondary: '#88B0FF', // Medium blue with glow
+    textTertiary: '#5A7ACC', // Darker blue
+    textInverse: '#0A0F1A', // Dark background
 
-    // Borders
-    border: '#1A1A1A',
-    borderDark: '#2A2A2A',
+    // Borders with glow
+    border: '#1A2A4A', // Dark blue with subtle glow
+    borderDark: '#2A3A5A', // Medium blue with glow
 
-    // Shadows (used in elevation) - lighter shadows for dark mode
-    shadowLight: 'rgba(255, 255, 255, 0.05)',
-    shadowMedium: 'rgba(255, 255, 255, 0.1)',
-    shadowDark: 'rgba(255, 255, 255, 0.2)',
+    // Shadows with glow effects
+    shadowLight: 'rgba(0, 255, 229, 0.1)', // Cyan glow shadow
+    shadowMedium: 'rgba(0, 255, 229, 0.2)', // Medium cyan glow
+    shadowDark: 'rgba(0, 255, 229, 0.3)', // Strong cyan glow
 };
 
 // Function to get colors based on theme
@@ -153,6 +153,86 @@ export const BorderRadius = {
     xxl: 24,
     full: 9999,
 };
+
+// Function to get shadows based on theme
+export function getShadows(theme: 'light' | 'dark' = 'light') {
+    if (theme === 'dark') {
+        return {
+            none: {
+                shadowColor: 'transparent',
+                shadowOffset: { width: 0, height: 0 },
+                shadowOpacity: 0,
+                shadowRadius: 0,
+                elevation: 0,
+            },
+            sm: {
+                shadowColor: '#00FFE5', // Cyan glow
+                shadowOffset: { width: 0, height: 1 },
+                shadowOpacity: 0.3,
+                shadowRadius: 4,
+                elevation: 2,
+            },
+            md: {
+                shadowColor: '#00FFE5', // Cyan glow
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.4,
+                shadowRadius: 8,
+                elevation: 4,
+            },
+            lg: {
+                shadowColor: '#00FFE5', // Cyan glow
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.5,
+                shadowRadius: 16,
+                elevation: 6,
+            },
+            xl: {
+                shadowColor: '#00FFE5', // Cyan glow
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.6,
+                shadowRadius: 24,
+                elevation: 8,
+            },
+        };
+    }
+    return {
+        none: {
+            shadowColor: 'transparent',
+            shadowOffset: { width: 0, height: 0 },
+            shadowOpacity: 0,
+            shadowRadius: 0,
+            elevation: 0,
+        },
+        sm: {
+            shadowColor: Colors.black,
+            shadowOffset: { width: 0, height: 1 },
+            shadowOpacity: 0.05,
+            shadowRadius: 2,
+            elevation: 1,
+        },
+        md: {
+            shadowColor: Colors.black,
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.08,
+            shadowRadius: 4,
+            elevation: 3,
+        },
+        lg: {
+            shadowColor: Colors.black,
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.12,
+            shadowRadius: 8,
+            elevation: 5,
+        },
+        xl: {
+            shadowColor: Colors.black,
+            shadowOffset: { width: 0, height: 8 },
+            shadowOpacity: 0.15,
+            shadowRadius: 16,
+            elevation: 8,
+        },
+    };
+}
 
 export const Shadows = {
     none: {
