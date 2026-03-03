@@ -30,6 +30,8 @@ export interface MensHealthCardData {
     id: string;
     createdAt: string; // ISO date string
     name?: string; // User's name
+    height?: number; // cm
+    weight?: number; // kg
     semenQuality: SemenQualityMetrics;
     lifestyle: LifestyleMetrics;
     notes?: string;

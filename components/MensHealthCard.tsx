@@ -254,6 +254,12 @@ export default function MensHealthCard({ card, isSelected = false, onSelect, sho
                         <LifestyleRow label="Sleep" value={`${card.lifestyle.sleepHoursPerNight} hrs/night`} />
                         <LifestyleRow label="Exercise" value={`${card.lifestyle.weeklyExerciseMinutes} min/week`} />
                         <LifestyleRow label="Diet Quality" value={card.lifestyle.dietQuality} />
+                        {card.height != null && (
+                            <LifestyleRow label="Height" value={`${card.height} cm`} />
+                        )}
+                        {card.weight != null && (
+                            <LifestyleRow label="Weight" value={`${card.weight} kg`} />
+                        )}
                     </View>
 
                     <Text style={styles.tapHint}>← Tap to flip back</Text>

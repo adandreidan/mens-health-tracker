@@ -13,7 +13,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BorderRadius, Colors, getColors, getShadows, Shadows, Spacing, Typography } from '../constants/design-system';
+import { BorderRadius, getColors, getShadows, Shadows, Spacing, Typography } from '../constants/design-system';
 import { useTheme } from '../contexts/ThemeContext';
 import { calculateHealthCardData } from '../data/mens-health-references';
 import { LifestyleMetrics, MensHealthCardData, SemenQualityMetrics } from '../types/mens-health-types';
@@ -104,10 +104,12 @@ export default function Card() {
     semen: SemenQualityMetrics,
     lifestyle: LifestyleMetrics,
     notes: string,
-    name?: string
+    name?: string,
+    height?: number,
+    weight?: number
   ) => {
     try {
-      console.log('Creating card with data:', { semen, lifestyle, notes, name });
+      console.log('Creating card with data:', { semen, lifestyle, notes, name, height, weight });
 
       // Calculate scores
       const cardData = calculateHealthCardData(semen, lifestyle, notes, name);
@@ -117,6 +119,8 @@ export default function Card() {
       const newCard: MensHealthCardData = {
         id: `card_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         createdAt: new Date().toISOString(),
+        height,
+        weight,
         ...cardData,
       };
 

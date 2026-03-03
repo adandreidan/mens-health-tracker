@@ -23,13 +23,17 @@ import {
 } from '../types/mens-health-types';
 
 interface MensHealthCardFormProps {
-    onSubmit: (semen: SemenQualityMetrics, lifestyle: LifestyleMetrics, notes: string, name?: string) => void;
+    onSubmit: (semen: SemenQualityMetrics, lifestyle: LifestyleMetrics, notes: string, name?: string, height?: number, weight?: number) => void;
     onCancel: () => void;
 }
 
 export default function MensHealthCardForm({ onSubmit, onCancel }: MensHealthCardFormProps) {
     // Name state
     const [name, setName] = useState('');
+
+    // Body measurements state
+    const [height, setHeight] = useState('');
+    const [weight, setWeight] = useState('');
 
     // Semen quality state
     const [spermConcentration, setSpermConcentration] = useState('');
@@ -108,145 +112,164 @@ export default function MensHealthCardForm({ onSubmit, onCancel }: MensHealthCar
             dietQuality,
         };
 
-        onSubmit(semenData, lifestyleData, notes, name.trim() || undefined);
+        const heightVal = height ? parseFloat(height) : undefined;
+        const weightVal = weight ? parseFloat(weight) : undefined;
+        onSubmit(semenData, lifestyleData, notes, name.trim() || undefined, heightVal, weightVal);
     };
 
     return (
-        <KeyboardAvoidingView 
-            style={styles.container} 
+        <KeyboardAvoidingView
+            style={styles.container}
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             keyboardVerticalOffset={0}
         >
-            <ScrollView 
-                style={styles.scrollView} 
+            <ScrollView
+                style={styles.scrollView}
                 contentContainerStyle={styles.contentContainer}
                 showsVerticalScrollIndicator={true}
                 keyboardShouldPersistTaps="handled"
             >
                 <View style={styles.header}>
-                <Text style={styles.title}>Create Men's Health Card</Text>
-                <TouchableOpacity onPress={onCancel} style={styles.cancelButton}>
-                    <Text style={styles.cancelText}>✕</Text>
-                </TouchableOpacity>
-            </View>
+                    <Text style={styles.title}>Create Men's Health Card</Text>
+                    <TouchableOpacity onPress={onCancel} style={styles.cancelButton}>
+                        <Text style={styles.cancelText}>✕</Text>
+                    </TouchableOpacity>
+                </View>
 
-            {/* Name Section */}
-            <InputField
-                label="Name (Optional)"
-                value={name}
-                onChangeText={setName}
-                placeholder="Enter your name"
-            />
+                {/* Name Section */}
+                <InputField
+                    label="Name (Optional)"
+                    value={name}
+                    onChangeText={setName}
+                    placeholder="Enter your name"
+                />
 
-            {/* Semen Quality Section */}
-            <Text style={styles.sectionTitle}>Semen Quality Metrics</Text>
+                {/* Body Measurements */}
+                <Text style={[styles.sectionTitle, { marginTop: 8 }]}>Body Measurements</Text>
+                <InputField
+                    label="Height (cm) (Optional)"
+                    value={height}
+                    onChangeText={setHeight}
+                    keyboardType="decimal-pad"
+                    placeholder="e.g., 180"
+                />
+                <InputField
+                    label="Weight (kg) (Optional)"
+                    value={weight}
+                    onChangeText={setWeight}
+                    keyboardType="decimal-pad"
+                    placeholder="e.g., 80"
+                />
 
-            <InputField
-                label="Sperm Concentration (million/mL)"
-                value={spermConcentration}
-                onChangeText={setSpermConcentration}
-                error={errors.spermConcentration}
-                keyboardType="decimal-pad"
-                placeholder="e.g., 52"
-            />
+                {/* Semen Quality Section */}
+                <Text style={styles.sectionTitle}>Semen Quality Metrics</Text>
 
-            <InputField
-                label="Total Sperm Count (million)"
-                value={totalSpermCount}
-                onChangeText={setTotalSpermCount}
-                error={errors.totalSpermCount}
-                keyboardType="decimal-pad"
-                placeholder="e.g., 180"
-            />
+                <InputField
+                    label="Sperm Concentration (million/mL)"
+                    value={spermConcentration}
+                    onChangeText={setSpermConcentration}
+                    error={errors.spermConcentration}
+                    keyboardType="decimal-pad"
+                    placeholder="e.g., 52"
+                />
 
-            <InputField
-                label="Progressive Motility (%)"
-                value={progressiveMotility}
-                onChangeText={setProgressiveMotility}
-                error={errors.progressiveMotility}
-                keyboardType="decimal-pad"
-                placeholder="e.g., 45"
-            />
+                <InputField
+                    label="Total Sperm Count (million)"
+                    value={totalSpermCount}
+                    onChangeText={setTotalSpermCount}
+                    error={errors.totalSpermCount}
+                    keyboardType="decimal-pad"
+                    placeholder="e.g., 180"
+                />
 
-            <InputField
-                label="Total Motility (%)"
-                value={totalMotility}
-                onChangeText={setTotalMotility}
-                error={errors.totalMotility}
-                keyboardType="decimal-pad"
-                placeholder="e.g., 60"
-            />
+                <InputField
+                    label="Progressive Motility (%)"
+                    value={progressiveMotility}
+                    onChangeText={setProgressiveMotility}
+                    error={errors.progressiveMotility}
+                    keyboardType="decimal-pad"
+                    placeholder="e.g., 45"
+                />
 
-            <InputField
-                label="Normal Morphology (%)"
-                value={normalMorphology}
-                onChangeText={setNormalMorphology}
-                error={errors.normalMorphology}
-                keyboardType="decimal-pad"
-                placeholder="e.g., 6"
-            />
+                <InputField
+                    label="Total Motility (%)"
+                    value={totalMotility}
+                    onChangeText={setTotalMotility}
+                    error={errors.totalMotility}
+                    keyboardType="decimal-pad"
+                    placeholder="e.g., 60"
+                />
 
-            <InputField
-                label="Semen Volume (mL)"
-                value={semenVolume}
-                onChangeText={setSemenVolume}
-                error={errors.semenVolume}
-                keyboardType="decimal-pad"
-                placeholder="e.g., 3.5"
-            />
+                <InputField
+                    label="Normal Morphology (%)"
+                    value={normalMorphology}
+                    onChangeText={setNormalMorphology}
+                    error={errors.normalMorphology}
+                    keyboardType="decimal-pad"
+                    placeholder="e.g., 6"
+                />
 
-            {/* Lifestyle Section */}
-            <Text style={[styles.sectionTitle, { marginTop: 24 }]}>Lifestyle Factors</Text>
+                <InputField
+                    label="Semen Volume (mL)"
+                    value={semenVolume}
+                    onChangeText={setSemenVolume}
+                    error={errors.semenVolume}
+                    keyboardType="decimal-pad"
+                    placeholder="e.g., 3.5"
+                />
 
-            <PickerField
-                label="Smoking Status"
-                options={['non-smoker', 'occasional', 'daily']}
-                selectedValue={smokingStatus}
-                onValueChange={(value) => setSmokingStatus(value as SmokingStatus)}
-            />
+                {/* Lifestyle Section */}
+                <Text style={[styles.sectionTitle, { marginTop: 24 }]}>Lifestyle Factors</Text>
 
-            <PickerField
-                label="Alcohol Risk Level"
-                options={['low', 'moderate', 'high']}
-                selectedValue={alcoholRiskLevel}
-                onValueChange={(value) => setAlcoholRiskLevel(value as AlcoholRiskLevel)}
-            />
+                <PickerField
+                    label="Smoking Status"
+                    options={['non-smoker', 'occasional', 'daily']}
+                    selectedValue={smokingStatus}
+                    onValueChange={(value) => setSmokingStatus(value as SmokingStatus)}
+                />
 
-            <InputField
-                label="Sleep Hours per Night"
-                value={sleepHours}
-                onChangeText={setSleepHours}
-                error={errors.sleepHours}
-                keyboardType="decimal-pad"
-                placeholder="e.g., 8"
-            />
+                <PickerField
+                    label="Alcohol Risk Level"
+                    options={['low', 'moderate', 'high']}
+                    selectedValue={alcoholRiskLevel}
+                    onValueChange={(value) => setAlcoholRiskLevel(value as AlcoholRiskLevel)}
+                />
 
-            <InputField
-                label="Weekly Exercise Minutes"
-                value={exerciseMinutes}
-                onChangeText={setExerciseMinutes}
-                error={errors.exerciseMinutes}
-                keyboardType="decimal-pad"
-                placeholder="e.g., 180"
-            />
+                <InputField
+                    label="Sleep Hours per Night"
+                    value={sleepHours}
+                    onChangeText={setSleepHours}
+                    error={errors.sleepHours}
+                    keyboardType="decimal-pad"
+                    placeholder="e.g., 8"
+                />
 
-            <PickerField
-                label="Diet Quality"
-                options={['poor', 'fair', 'good']}
-                selectedValue={dietQuality}
-                onValueChange={(value) => setDietQuality(value as DietQuality)}
-            />
+                <InputField
+                    label="Weekly Exercise Minutes"
+                    value={exerciseMinutes}
+                    onChangeText={setExerciseMinutes}
+                    error={errors.exerciseMinutes}
+                    keyboardType="decimal-pad"
+                    placeholder="e.g., 180"
+                />
 
-            {/* Notes Section */}
-            <Text style={[styles.sectionTitle, { marginTop: 24 }]}>Notes (Optional)</Text>
-            <TextInput
-                style={styles.notesInput}
-                value={notes}
-                onChangeText={setNotes}
-                placeholder="Add any notes or comments..."
-                multiline
-                numberOfLines={3}
-            />
+                <PickerField
+                    label="Diet Quality"
+                    options={['poor', 'fair', 'good']}
+                    selectedValue={dietQuality}
+                    onValueChange={(value) => setDietQuality(value as DietQuality)}
+                />
+
+                {/* Notes Section */}
+                <Text style={[styles.sectionTitle, { marginTop: 24 }]}>Notes (Optional)</Text>
+                <TextInput
+                    style={styles.notesInput}
+                    value={notes}
+                    onChangeText={setNotes}
+                    placeholder="Add any notes or comments..."
+                    multiline
+                    numberOfLines={3}
+                />
 
                 {/* Submit Button */}
                 <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>

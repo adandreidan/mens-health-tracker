@@ -555,7 +555,7 @@ export default function Leaderboard() {
 
   // Find current user by card name or fallback to CURRENT_USER_ID
   const currentUserCardName = mensHealthCard?.name || 'Andrew';
-  const currentUser = leaderboardData.find(item => 
+  const currentUser = leaderboardData.find(item =>
     item.user_id === currentUserCardName || item.user_id === CURRENT_USER_ID
   );
   const currentUserScore = mensHealthCard ? mensHealthCard.overallHealthIndex : null;
@@ -653,6 +653,18 @@ export default function Leaderboard() {
                 <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>Alcohol Risk</Text>
                 <Text style={[styles.metricValue, { color: colors.textPrimary }]}>{mensHealthCard.lifestyle.alcoholRiskLevel}</Text>
               </View>
+              {mensHealthCard.height != null && (
+                <View style={[styles.metricItem, { backgroundColor: colors.white }, shadows.sm]}>
+                  <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>Height</Text>
+                  <Text style={[styles.metricValue, { color: colors.textPrimary }]}>{mensHealthCard.height} cm</Text>
+                </View>
+              )}
+              {mensHealthCard.weight != null && (
+                <View style={[styles.metricItem, { backgroundColor: colors.white }, shadows.sm]}>
+                  <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>Weight</Text>
+                  <Text style={[styles.metricValue, { color: colors.textPrimary }]}>{mensHealthCard.weight} kg</Text>
+                </View>
+              )}
             </View>
           </View>
         )}
@@ -724,8 +736,8 @@ export default function Leaderboard() {
                     backgroundGradientFrom: colors.white,
                     backgroundGradientTo: colors.white,
                     decimalPlaces: 1,
-                    color: (opacity = 1) => colorScheme === 'dark' 
-                      ? `rgba(0, 255, 229, ${opacity})` 
+                    color: (opacity = 1) => colorScheme === 'dark'
+                      ? `rgba(0, 255, 229, ${opacity})`
                       : `rgba(0, 0, 0, ${opacity})`,
                     labelColor: (opacity = 1) => colorScheme === 'dark'
                       ? `rgba(136, 176, 255, ${opacity})`
@@ -789,10 +801,10 @@ export default function Leaderboard() {
 
               {/* Number Line Container with relative positioning */}
               <View style={styles.numberLineViewContainer}>
-              {/* Visible horizontal line through the dots */}
-              <View style={styles.numberLine}>
-                <View style={[styles.numberLineBar, { backgroundColor: colorScheme === 'dark' ? colors.textPrimary : colors.black }]} />
-              </View>
+                {/* Visible horizontal line through the dots */}
+                <View style={styles.numberLine}>
+                  <View style={[styles.numberLineBar, { backgroundColor: colorScheme === 'dark' ? colors.textPrimary : colors.black }]} />
+                </View>
 
                 {/* Individual user points on number line */}
                 <View style={styles.numberLineContainer}>
@@ -812,7 +824,7 @@ export default function Leaderboard() {
                           style={[
                             styles.numberLinePoint,
                             {
-                              backgroundColor: isCurrentUser 
+                              backgroundColor: isCurrentUser
                                 ? (colorScheme === 'dark' ? colors.success : colors.black)
                                 : (colorScheme === 'dark' ? colors.grey500 : colors.grey500),
                               left: `${Math.max(0, Math.min(100, position))}%`,
@@ -890,7 +902,7 @@ export default function Leaderboard() {
               </View>
               <View style={styles.userInfo}>
                 <Text style={[styles.userId, { color: (item.user_id === CURRENT_USER_ID || (mensHealthCard && item.user_id === (mensHealthCard?.name || 'Andrew'))) ? colors.white : colors.textPrimary }]}>
-                  {item.user_id === CURRENT_USER_ID || (mensHealthCard && item.user_id === (mensHealthCard?.name || 'Andrew')) 
+                  {item.user_id === CURRENT_USER_ID || (mensHealthCard && item.user_id === (mensHealthCard?.name || 'Andrew'))
                     ? (mensHealthCard?.name || 'Andrew')
                     : item.user_id}
                 </Text>
