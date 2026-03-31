@@ -18,6 +18,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { BorderRadius, getColors, Shadows, Spacing, Typography } from '../constants/design-system';
 import { useTheme } from '../contexts/ThemeContext';
 import { MoodEntry } from '../types/mood-types';
+import DailyMoodChart from './DailyMoodChart';
 import {
   calculateAverageMood,
   calculateTrend,
@@ -426,6 +427,11 @@ export default function MoodCheckIn() {
             </>
           )}
         </View>
+
+        {/* Daily Mood Chart */}
+        {recentEntries.length > 0 && (
+          <DailyMoodChart entries={recentEntries} />
+        )}
 
         {/* Mood History Chart */}
         {chartData && recentEntries.length > 0 && (
